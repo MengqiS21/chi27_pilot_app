@@ -1,6 +1,10 @@
+import os
+
 import anthropic
 
 from content.system_prompts import CONDITIONS
+
+DEFAULT_MODEL = "claude-sonnet-4-20250514"
 
 REFUSAL_NOTE = (
     "\n\n[SYSTEM NOTE: The user has now sent their 3rd message. "
@@ -24,7 +28,7 @@ def get_ai_response(
         if m.get("content")
     ]
     response = client.messages.create(
-        model="claude-sonnet-4-20250514",
+        model=os.environ.get("ANTHROPIC_MODEL", DEFAULT_MODEL),
         max_tokens=1000,
         system=system,
         messages=api_messages,

@@ -2,6 +2,12 @@ import Anthropic from "@anthropic-ai/sdk";
 import { CONDITIONS, REFUSAL_NOTE } from "@/content/system-prompts";
 import type { ChatMessage } from "./types";
 
+const DEFAULT_MODEL = "claude-sonnet-4-20250514";
+
+function getModel(): string {
+  return process.env.ANTHROPIC_MODEL?.trim() || DEFAULT_MODEL;
+}
+
 export async function getAiResponse(
   messages: ChatMessage[],
   condition: string,
@@ -14,7 +20,7 @@ export async function getAiResponse(
   }
 
   const response = await client.messages.create({
-    model: "claude-sonnet-4-20250514",
+    model: getModel(),
     max_tokens: 1000,
     system,
     messages: messages
