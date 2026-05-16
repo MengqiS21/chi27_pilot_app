@@ -42,7 +42,7 @@
   }
 
   .btn-secondary {
-    @apply inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-btn border-[1.5px] border-accent bg-transparent px-7 py-3 text-base font-semibold text-accent transition-colors hover:bg-[#EEF1F8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-btn border-[1.5px] border-accent bg-transparent px-7 py-3 text-base font-semibold text-accent transition-colors hover:bg-chat-user focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50;
   }
 
   .field-label {
