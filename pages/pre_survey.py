@@ -16,7 +16,7 @@ def render() -> None:
     age = st.text_input("What is your age?")
     gender = st.selectbox(
         "What is your gender?",
-        ["Woman", "Man", "Non-binary", "Prefer not to say", "Other"],
+        ["Female", "Male", "Non-binary", "Prefer not to say", "Other"],
         index=None,
         placeholder="Select an option…",
     )
