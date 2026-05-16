@@ -293,24 +293,28 @@ export function ExperimentApp() {
             lead="Thank you for participating in this research study."
           />
           <div className="card">
-            <label className="field-label" htmlFor="access-code">
-              Access code
-            </label>
-            <input
-              id="access-code"
-              className="field-input mb-6 max-w-sm"
-              value={accessCode}
-              onChange={(e) => setAccessCode(e.target.value)}
-              autoComplete="off"
-            />
-            <button
-              type="button"
-              className="btn-primary"
-              disabled={loading}
-              onClick={handleBegin}
-            >
-              {loading ? "Starting…" : "Begin"}
-            </button>
+            <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
+              <div className="min-w-0 flex-1 sm:max-w-sm">
+                <label className="field-label" htmlFor="access-code">
+                  Access code
+                </label>
+                <input
+                  id="access-code"
+                  className="field-input w-full"
+                  value={accessCode}
+                  onChange={(e) => setAccessCode(e.target.value)}
+                  autoComplete="off"
+                />
+              </div>
+              <button
+                type="button"
+                className="btn-primary shrink-0 sm:mb-0.5"
+                disabled={loading}
+                onClick={handleBegin}
+              >
+                {loading ? "Starting…" : "Begin"}
+              </button>
+            </div>
           </div>
         </>
       )}

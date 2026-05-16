@@ -3,6 +3,12 @@
 @tailwind utilities;
 
 @layer base {
+  :root {
+    --accent: #9b8ad4;
+    --accent-hover: #8474b8;
+    --chat-user: #f0ebfa;
+  }
+
   html {
     @apply bg-page text-ink antialiased;
   }
@@ -38,7 +44,16 @@
   }
 
   .btn-primary {
-    @apply inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-btn bg-accent px-7 py-3 text-base font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50;
+    @apply inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-btn px-7 py-3 text-base font-semibold text-white transition-colors focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 disabled:cursor-not-allowed disabled:opacity-50;
+    background-color: var(--accent);
+  }
+
+  .btn-primary:hover:not(:disabled) {
+    background-color: var(--accent-hover);
+  }
+
+  .btn-primary:focus-visible {
+    outline-color: var(--accent);
   }
 
   .btn-secondary {
@@ -66,11 +81,13 @@
   }
 
   .progress-fill {
-    @apply h-full rounded-sm bg-accent transition-all duration-300;
+    @apply h-full rounded-sm transition-all duration-300;
+    background-color: var(--accent);
   }
 
   .scenario-box {
-    @apply mb-7 rounded-btn border-l-[3px] border-accent bg-scenario px-6 py-5 text-[0.9375rem] italic leading-relaxed text-ink;
+    @apply mb-7 rounded-btn border-l-[3px] bg-scenario px-6 py-5 text-[0.9375rem] italic leading-relaxed text-ink;
+    border-left-color: var(--accent);
   }
 
   .consent-box {
@@ -98,7 +115,9 @@
   }
 
   .likert-option:has(input:checked) {
-    @apply border-accent bg-accent text-white;
+    @apply text-white;
+    border-color: var(--accent);
+    background-color: var(--accent);
   }
 
   .likert-option input {
@@ -126,7 +145,8 @@
   }
 
   .chat-bubble-user {
-    @apply rounded-[16px_16px_4px_16px] bg-chat-user px-4 py-3 text-base leading-relaxed text-ink;
+    @apply rounded-[16px_16px_4px_16px] px-4 py-3 text-base leading-relaxed text-ink;
+    background-color: var(--chat-user);
   }
 
   .chat-bubble-assistant {
