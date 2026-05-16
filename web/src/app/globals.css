@@ -1,0 +1,143 @@
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+@layer base {
+  html {
+    @apply bg-page text-ink antialiased;
+  }
+
+  body {
+    @apply min-h-screen font-sans text-base leading-relaxed;
+  }
+
+  :focus-visible {
+    @apply outline-2 outline-offset-2 outline-accent;
+  }
+}
+
+@layer components {
+  .page-shell {
+    @apply mx-auto w-full max-w-content px-6 pb-16 pt-12;
+  }
+
+  .card {
+    @apply rounded-card border border-border bg-surface p-8;
+  }
+
+  .page-title {
+    @apply text-[1.75rem] font-bold leading-tight text-ink;
+  }
+
+  .page-lead {
+    @apply mt-2 text-base leading-relaxed text-muted;
+  }
+
+  .section-title {
+    @apply text-2xl font-bold text-ink;
+  }
+
+  .btn-primary {
+    @apply inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-btn bg-accent px-7 py-3 text-base font-semibold text-white transition-colors hover:bg-accent-hover focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .btn-secondary {
+    @apply inline-flex min-h-[44px] min-w-[44px] items-center justify-center rounded-btn border-[1.5px] border-accent bg-transparent px-7 py-3 text-base font-semibold text-accent transition-colors hover:bg-[#EEF1F8] focus-visible:outline focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-accent disabled:cursor-not-allowed disabled:opacity-50;
+  }
+
+  .field-label {
+    @apply mb-2 block text-base font-semibold text-ink;
+  }
+
+  .field-input {
+    @apply w-full min-h-[44px] rounded-btn border-[1.5px] border-input-border bg-surface px-4 py-3 text-base text-ink transition-shadow focus:border-accent focus:outline-none focus:ring-[3px] focus:ring-accent/15;
+  }
+
+  .field-select {
+    @apply field-input max-w-md;
+  }
+
+  .alert-error {
+    @apply rounded-btn border border-error bg-error-bg px-4 py-3 text-base text-error;
+  }
+
+  .progress-track {
+    @apply h-1.5 w-full overflow-hidden rounded-sm bg-border;
+  }
+
+  .progress-fill {
+    @apply h-full rounded-sm bg-accent transition-all duration-300;
+  }
+
+  .scenario-box {
+    @apply mb-7 rounded-btn border-l-[3px] border-accent bg-scenario px-6 py-5 text-[0.9375rem] italic leading-relaxed text-ink;
+  }
+
+  .consent-box {
+    @apply whitespace-pre-wrap text-base leading-relaxed text-ink;
+  }
+
+  .likert-item {
+    @apply border-b border-border py-6 last:border-b-0;
+  }
+
+  .likert-statement {
+    @apply mb-4 text-base font-medium leading-relaxed text-ink;
+  }
+
+  .likert-ends {
+    @apply mb-3 flex justify-between text-[0.8125rem] leading-snug text-muted;
+  }
+
+  .likert-options {
+    @apply flex flex-wrap justify-center gap-2;
+  }
+
+  .likert-option {
+    @apply relative flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-full border-2 border-input-border bg-surface text-sm font-semibold text-ink transition-colors hover:border-accent;
+  }
+
+  .likert-option:has(input:checked) {
+    @apply border-accent bg-accent text-white;
+  }
+
+  .likert-option input {
+    @apply sr-only;
+  }
+
+  .chat-thread {
+    @apply mx-auto mb-6 flex max-w-chat flex-col gap-4;
+  }
+
+  .chat-row {
+    @apply flex max-w-[85%] flex-col;
+  }
+
+  .chat-row-user {
+    @apply ml-auto items-end;
+  }
+
+  .chat-row-assistant {
+    @apply mr-auto items-start;
+  }
+
+  .chat-role {
+    @apply mb-1 text-[0.8125rem] font-semibold text-muted;
+  }
+
+  .chat-bubble-user {
+    @apply rounded-[16px_16px_4px_16px] bg-chat-user px-4 py-3 text-base leading-relaxed text-ink;
+  }
+
+  .chat-bubble-assistant {
+    @apply rounded-[16px_16px_16px_4px] border border-border bg-surface px-4 py-3 text-base leading-relaxed text-ink;
+  }
+
+  .checkbox-row {
+    @apply flex min-h-[44px] items-start gap-3;
+  }
+
+  .checkbox-row input {
+    @apply mt-1 h-5 w-5 shrink-0 accent-accent;
+  }
+}
