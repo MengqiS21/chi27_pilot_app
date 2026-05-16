@@ -1,5 +1,6 @@
 "use client";
 
+import { ChatAvatar } from "@/components/ChatAvatar";
 import type { ChatMessage } from "@/lib/types";
 
 type Props = {
@@ -18,11 +19,16 @@ export function ChatPanel({ messages }: Props) {
         return (
           <div
             key={`${msg.role}-${i}-${msg.content.slice(0, 24)}`}
-            className={`chat-row ${isUser ? "chat-row-user" : "chat-row-assistant"}`}
+            className={`chat-message ${isUser ? "chat-message-user" : "chat-message-assistant"}`}
           >
-            <span className="chat-role">{isUser ? "You" : "AI"}</span>
-            <div className={isUser ? "chat-bubble-user" : "chat-bubble-assistant"}>
-              {msg.content}
+            <ChatAvatar role={msg.role} />
+            <div className="chat-message-body">
+              <span className="chat-role">{isUser ? "You" : "AI"}</span>
+              <div
+                className={isUser ? "chat-bubble-user" : "chat-bubble-assistant"}
+              >
+                {msg.content}
+              </div>
             </div>
           </div>
         );

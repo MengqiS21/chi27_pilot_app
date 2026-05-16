@@ -4,9 +4,9 @@
 
 @layer base {
   :root {
-    --accent: #9b8ad4;
-    --accent-hover: #8474b8;
-    --chat-user: #f0ebfa;
+    --accent: #8879b6;
+    --accent-hover: #7264a8;
+    --chat-user: #edeaf7;
   }
 
   html {
@@ -41,6 +41,26 @@
 
   .section-title {
     @apply text-2xl font-bold text-ink;
+  }
+
+  .icon-badge {
+    @apply inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-full;
+    color: var(--accent);
+    background-color: var(--chat-user);
+  }
+
+  .icon-badge-lg {
+    @apply inline-flex h-12 w-12 items-center justify-center rounded-full;
+    color: var(--accent);
+    background-color: var(--chat-user);
+  }
+
+  .field-label-row {
+    @apply mb-2 flex items-center gap-2;
+  }
+
+  .field-label-row .field-label {
+    @apply mb-0;
   }
 
   .btn-primary {
@@ -125,23 +145,45 @@
   }
 
   .chat-thread {
-    @apply mx-auto mb-6 flex max-w-chat flex-col gap-4;
+    @apply mx-auto mb-6 flex max-w-chat flex-col gap-5;
   }
 
-  .chat-row {
-    @apply flex max-w-[85%] flex-col;
+  .chat-message {
+    @apply flex max-w-[92%] gap-3;
   }
 
-  .chat-row-user {
-    @apply ml-auto items-end;
+  .chat-message-user {
+    @apply ml-auto flex-row-reverse items-end;
   }
 
-  .chat-row-assistant {
-    @apply mr-auto items-start;
+  .chat-message-assistant {
+    @apply mr-auto items-end;
+  }
+
+  .chat-message-body {
+    @apply flex min-w-0 flex-col;
+  }
+
+  .chat-message-user .chat-message-body {
+    @apply items-end;
+  }
+
+  .chat-avatar {
+    @apply flex h-9 w-9 shrink-0 items-center justify-center rounded-full;
+  }
+
+  .chat-avatar-user {
+    color: #fff;
+    background-color: var(--accent);
+  }
+
+  .chat-avatar-ai {
+    @apply border border-border bg-surface;
+    color: var(--accent);
   }
 
   .chat-role {
-    @apply mb-1 text-[0.8125rem] font-semibold text-muted;
+    @apply mb-1.5 text-[0.8125rem] font-semibold text-muted;
   }
 
   .chat-bubble-user {

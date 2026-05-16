@@ -1,10 +1,28 @@
 "use client";
 
 import { useCallback, useState } from "react";
+import {
+  ArrowRight,
+  CheckCircle2,
+  ClipboardList,
+  ClipboardPen,
+  Compass,
+  HeartHandshake,
+  KeyRound,
+  MessageSquare,
+  MessagesSquare,
+  Scale,
+  Send,
+  ShieldCheck,
+  Sparkles,
+  Users,
+  Bot,
+} from "lucide-react";
 import { ChatPanel } from "@/components/ChatPanel";
 import { LikertBlock } from "@/components/LikertBlock";
 import { PageHeader } from "@/components/PageHeader";
 import { ProgressBar } from "@/components/ProgressBar";
+import { SectionHeading } from "@/components/SectionHeading";
 import { CONSENT_TEXT } from "@/content/consent";
 import { SCENARIOS } from "@/content/scenarios";
 import {
@@ -291,13 +309,16 @@ export function ExperimentApp() {
           <PageHeader
             title="Welcome"
             lead="Thank you for participating in this research study."
+            icon={Sparkles}
           />
-          <div className="card">
-            <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
-              <div className="min-w-0 flex-1 sm:max-w-sm">
+          <div className="flex flex-col gap-6 sm:flex-row sm:items-end">
+            <div className="min-w-0 flex-1 sm:max-w-sm">
+              <div className="field-label-row">
+                <KeyRound size={18} strokeWidth={2} className="shrink-0 text-accent" aria-hidden />
                 <label className="field-label" htmlFor="access-code">
                   Access code
                 </label>
+              </div>
                 <input
                   id="access-code"
                   className="field-input w-full"
@@ -313,15 +334,14 @@ export function ExperimentApp() {
                 onClick={handleBegin}
               >
                 {loading ? "Starting…" : "Begin"}
-              </button>
-            </div>
+            </button>
           </div>
         </>
       )}
 
       {state.stage === "consent" && (
         <>
-          <PageHeader title="Before We Begin" />
+          <PageHeader title="Before We Begin" icon={ClipboardList} />
           <div className="card">
             <div className="consent-box">{CONSENT_TEXT}</div>
             <hr className="my-8 border-border" />
@@ -331,15 +351,19 @@ export function ExperimentApp() {
                 checked={consentAgreed}
                 onChange={(e) => setConsentAgreed(e.target.checked)}
               />
-              <span>I agree and wish to continue</span>
+              <span className="flex items-center gap-2">
+                <ShieldCheck size={18} strokeWidth={2} className="shrink-0 text-accent" aria-hidden />
+                I agree and wish to continue
+              </span>
             </label>
             <button
               type="button"
-              className="btn-primary"
+              className="btn-primary inline-flex items-center gap-2"
               disabled={!consentAgreed || loading}
               onClick={handleConsentContinue}
             >
               Continue
+              <ArrowRight size={18} strokeWidth={2} aria-hidden />
             </button>
           </div>
         </>
@@ -350,6 +374,7 @@ export function ExperimentApp() {
           <PageHeader
             title="A Few Questions About You"
             lead="There are no right or wrong answers."
+            icon={ClipboardPen}
           />
           <div className="card">
             <label className="field-label" htmlFor="age">
@@ -397,7 +422,7 @@ export function ExperimentApp() {
             </select>
 
             <hr className="mb-8 border-border" />
-            <h2 className="section-title mb-4">Social support</h2>
+            <SectionHeading icon={Users}>Social support</SectionHeading>
             <LikertBlock
               items={PRE_SURVEY.social_support}
               keys={PRE_SURVEY_KEYS.social_support}
@@ -409,7 +434,7 @@ export function ExperimentApp() {
             />
 
             <hr className="my-8 border-border" />
-            <h2 className="section-title mb-4">AI use</h2>
+            <SectionHeading icon={Bot}>AI use</SectionHeading>
             <LikertBlock
               items={PRE_SURVEY.ai_reliance}
               keys={PRE_SURVEY_KEYS.ai_reliance}
@@ -421,7 +446,7 @@ export function ExperimentApp() {
             />
 
             <hr className="my-8 border-border" />
-            <h2 className="section-title mb-4">Comfort disclosing</h2>
+            <SectionHeading icon={HeartHandshake}>Comfort disclosing</SectionHeading>
             <LikertBlock
               items={PRE_SURVEY.disclosure_comfort}
               keys={PRE_SURVEY_KEYS.disclosure_comfort}
@@ -434,11 +459,12 @@ export function ExperimentApp() {
 
             <button
               type="button"
-              className="btn-primary mt-8"
+              className="btn-primary mt-8 inline-flex items-center gap-2"
               disabled={loading}
               onClick={handlePreSurveyContinue}
             >
               Continue to scenarios
+              <ArrowRight size={18} strokeWidth={2} aria-hidden />
             </button>
           </div>
         </>
@@ -451,7 +477,8 @@ export function ExperimentApp() {
             {SCENARIOS[currentScenarioType(state)].text}
           </div>
           <div className="card">
-            <p className="mb-1 text-base font-semibold text-ink">
+            <p className="mb-1 flex items-center gap-2 text-base font-semibold text-ink">
+              <MessagesSquare size={20} strokeWidth={2} className="shrink-0 text-accent" aria-hidden />
               Conversation with the AI
             </p>
             <p className="mb-6 text-[0.9375rem] text-muted">
@@ -464,11 +491,12 @@ export function ExperimentApp() {
             {state.refusalDelivered ? (
               <button
                 type="button"
-                className="btn-primary"
+                className="btn-primary inline-flex items-center gap-2"
                 disabled={loading}
                 onClick={handleContinueToSurvey}
               >
-                Continue to Survey →
+                Continue to Survey
+                <ArrowRight size={18} strokeWidth={2} aria-hidden />
               </button>
             ) : (
               <form
@@ -493,10 +521,11 @@ export function ExperimentApp() {
                   />
                   <button
                     type="submit"
-                    className="btn-primary shrink-0"
+                    className="btn-primary inline-flex shrink-0 items-center gap-2"
                     disabled={loading || !chatInput.trim()}
                   >
                     {loading ? "AI is typing…" : "Send"}
+                    {!loading ? <Send size={18} strokeWidth={2} aria-hidden /> : null}
                   </button>
                 </div>
               </form>
@@ -510,6 +539,7 @@ export function ExperimentApp() {
           <PageHeader
             title="Your Thoughts"
             lead="Please rate how much you agree with each statement based on the conversation you just had."
+            icon={MessageSquare}
           />
           <div className="card">
             <LikertBlock
@@ -523,7 +553,7 @@ export function ExperimentApp() {
             />
 
             <hr className="my-8 border-border" />
-            <h2 className="section-title mb-4">What you would do next</h2>
+            <SectionHeading icon={Compass}>What you would do next</SectionHeading>
             <LikertBlock
               items={POST_SURVEY.behavioral_intention}
               keys={POST_SURVEY_KEYS.behavioral_intention}
@@ -535,7 +565,7 @@ export function ExperimentApp() {
             />
 
             <hr className="my-8 border-border" />
-            <h2 className="section-title mb-4">How the interaction felt</h2>
+            <SectionHeading icon={Scale}>How the interaction felt</SectionHeading>
             <LikertBlock
               items={POST_SURVEY.mediators}
               keys={POST_SURVEY_KEYS.mediators}
@@ -563,6 +593,7 @@ export function ExperimentApp() {
           <PageHeader
             title="You're All Done"
             lead="Thank you for your time. You may close this browser window when you're ready."
+            icon={CheckCircle2}
           />
           <div className="card">
             <p className="text-base leading-relaxed text-ink">
