@@ -122,25 +122,82 @@
     @apply mb-4 text-base font-medium leading-relaxed text-ink;
   }
 
-  .likert-ends {
-    @apply mb-3 flex justify-between text-[0.8125rem] leading-snug text-muted;
+  .likert-scale {
+    @apply grid w-full gap-x-0.5 sm:gap-x-1;
+    grid-template-columns: repeat(7, minmax(0, 1fr));
   }
 
-  .likert-options {
-    @apply flex flex-wrap justify-center gap-2;
+  .likert-scale-cell {
+    @apply flex min-w-0 flex-col items-center;
+  }
+
+  .likert-hint {
+    @apply mb-2 flex w-full min-h-[2.25rem] items-end justify-center sm:min-h-[2.5rem];
+  }
+
+  .likert-hint-end,
+  .likert-hint-selected {
+    @apply block w-full text-center font-medium leading-none;
+    white-space: nowrap;
+  }
+
+  .likert-hint-end {
+    @apply text-[0.5625rem] text-muted sm:text-[0.6875rem];
+  }
+
+  .likert-hint-selected {
+    @apply text-[0.625rem] sm:text-[0.6875rem];
+    color: var(--accent);
+  }
+
+  .likert-hint-placeholder {
+    @apply invisible block h-0 overflow-hidden;
+  }
+
+  .likert-option-hit {
+    @apply flex cursor-pointer items-center justify-center rounded-full p-1.5 transition-colors;
+    min-width: 44px;
+    min-height: 44px;
   }
 
   .likert-option {
-    @apply relative flex min-h-[44px] min-w-[44px] cursor-pointer items-center justify-center rounded-full border-2 border-input-border bg-surface text-sm font-semibold text-ink transition-colors hover:border-accent;
+    @apply flex shrink-0 items-center justify-center rounded-full border-2 border-input-border bg-surface font-semibold text-ink transition-all duration-200;
   }
 
-  .likert-option:has(input:checked) {
-    @apply text-white;
-    border-color: var(--accent);
+  .likert-option-hit:hover .likert-option:not(.likert-option-selected) {
+    @apply border-accent;
+  }
+
+  .likert-option-selected {
+    @apply border-accent text-white;
     background-color: var(--accent);
   }
 
-  .likert-option input {
+  .likert-option-num {
+    @apply text-sm leading-none;
+  }
+
+  .likert-size-sm {
+    width: 2rem;
+    height: 2rem;
+  }
+
+  .likert-size-md {
+    width: 2.375rem;
+    height: 2.375rem;
+  }
+
+  .likert-size-lg {
+    width: 2.75rem;
+    height: 2.75rem;
+  }
+
+  .likert-size-xl {
+    width: 3.125rem;
+    height: 3.125rem;
+  }
+
+  .likert-option-hit input {
     @apply sr-only;
   }
 
