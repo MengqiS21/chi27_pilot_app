@@ -1,6 +1,6 @@
 import { NextResponse } from "next/server";
 import { VALID_CODES } from "@/content/access-codes";
-import { getAssignment } from "@/lib/latin-square";
+import { assignPilot } from "@/lib/assignment";
 import { getSupabase } from "@/lib/supabase";
 
 export async function POST(request: Request) {
@@ -17,23 +17,26 @@ export async function POST(request: Request) {
     const supabase = getSupabase();
     const { count, error: countError } = await supabase
       .from("participants")
-      .select("id", { count: "exact", head: true });
+      .select("id", { count: "exact", head: true })
+      .eq("study", "pilot");
 
     if (countError) {
       return NextResponse.json({ error: countError.message }, { status: 500 });
     }
 
-    const row = (count ?? 0) % 4;
-    const assignment = getAssignment(row);
+    const assignment = assignPilot(count ?? 0);
 
     const { data, error } = await supabase
       .from("participants")
       .insert({
         access_code: code,
-        latin_square_row: row,
-        scenario_order: assignment.scenarios,
-        condition_order: assignment.conditions,
-        stage: "consent",
+        study: assignment.study,
+        scenario_order: assignment.scenarioOrder,
+        experienced_scenario_index: assignment.experiencedScenarioIndex,
+        assigned_condition: assignment.assignedCondition,
+        condition_order: assignment.conditionOrder,
+        latin_square_row: (count ?? 0) % 4,
+        stage: "screening",
       })
       .select("id")
       .single();
@@ -44,8 +47,10 @@ export async function POST(request: Request) {
 
     return NextResponse.json({
       participantId: data.id,
-      scenarioOrder: assignment.scenarios,
-      conditionOrder: assignment.conditions,
+      study: assignment.study,
+      scenarioOrder: assignment.scenarioOrder,
+      experiencedScenarioIndex: assignment.experiencedScenarioIndex,
+      assignedCondition: assignment.assignedCondition,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error";

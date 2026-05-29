@@ -1,24 +1,20 @@
 "use client";
 
+import {
+  SCALE_PRESETS,
+  type ScalePreset,
+} from "@/lib/scales";
+
 type Props = {
   items: readonly string[];
   keys: readonly string[];
   values: Record<string, number | null>;
   onChange: (key: string, value: number) => void;
   namePrefix: string;
+  scale?: ScalePreset;
 };
 
-const SCALE = [1, 2, 3, 4, 5, 6, 7] as const;
-
-const MIDDLE_LABELS: Record<2 | 3 | 4 | 5 | 6, string> = {
-  2: "Disagree",
-  3: "Somewhat Disagree",
-  4: "Neutral",
-  5: "Somewhat Agree",
-  6: "Agree",
-};
-
-const SIZE_CLASS: Record<(typeof SCALE)[number], string> = {
+const SIZE_CLASS: Record<number, string> = {
   1: "likert-size-xl",
   2: "likert-size-lg",
   3: "likert-size-md",
@@ -28,27 +24,32 @@ const SIZE_CLASS: Record<(typeof SCALE)[number], string> = {
   7: "likert-size-xl",
 };
 
-const ARIA_LABELS: Record<(typeof SCALE)[number], string> = {
-  1: "1 — Strongly disagree",
-  2: "2 — Disagree",
-  3: "3 — Somewhat Disagree",
-  4: "4 — Neutral",
-  5: "5 — Somewhat Agree",
-  6: "6 — Agree",
-  7: "7 — Strongly agree",
-};
-
 function hintAboveCircle(
-  n: (typeof SCALE)[number],
-  isSelected: boolean
+  n: number,
+  isSelected: boolean,
+  config: (typeof SCALE_PRESETS)[ScalePreset],
+  min: number,
+  max: number
 ): string | null {
-  if (n === 1) return "Strongly Disagree";
-  if (n === 7) return "Strongly Agree";
-  if (isSelected) return MIDDLE_LABELS[n as 2 | 3 | 4 | 5 | 6];
+  if (n === min) return config.lowLabel;
+  if (n === max) return config.highLabel;
+  if (isSelected && config.middleLabels[n]) return config.middleLabels[n]!;
   return null;
 }
 
-export function LikertBlock({ items, keys, values, onChange, namePrefix }: Props) {
+export function LikertBlock({
+  items,
+  keys,
+  values,
+  onChange,
+  namePrefix,
+  scale = "agree7",
+}: Props) {
+  const config = SCALE_PRESETS[scale];
+  const scaleValues = config.values;
+  const min = scaleValues[0];
+  const max = scaleValues[scaleValues.length - 1];
+
   return (
     <div className="space-y-0">
       {items.map((statement, i) => {
@@ -64,10 +65,11 @@ export function LikertBlock({ items, keys, values, onChange, namePrefix }: Props
               role="radiogroup"
               aria-label={statement}
             >
-              {SCALE.map((n) => {
+              {scaleValues.map((n) => {
                 const isSelected = selected === n;
-                const hint = hintAboveCircle(n, isSelected);
-                const isEndHint = n === 1 || n === 7;
+                const hint = hintAboveCircle(n, isSelected, config, min, max);
+                const isEndHint = n === min || n === max;
+                const sizeClass = SIZE_CLASS[n] ?? "likert-size-md";
 
                 return (
                   <div key={n} className="likert-scale-cell">
@@ -90,7 +92,7 @@ export function LikertBlock({ items, keys, values, onChange, namePrefix }: Props
                       )}
                     </div>
                     <label
-                      className={`likert-option-hit ${SIZE_CLASS[n]} ${
+                      className={`likert-option-hit ${sizeClass} ${
                         isSelected ? "likert-option-hit-selected" : ""
                       }`}
                     >
@@ -100,10 +102,10 @@ export function LikertBlock({ items, keys, values, onChange, namePrefix }: Props
                         value={n}
                         checked={isSelected}
                         onChange={() => onChange(fieldKey, n)}
-                        aria-label={ARIA_LABELS[n]}
+                        aria-label={config.ariaLabel(n)}
                       />
                       <span
-                        className={`likert-option ${SIZE_CLASS[n]} ${
+                        className={`likert-option ${sizeClass} ${
                           isSelected ? "likert-option-selected" : ""
                         }`}
                       >

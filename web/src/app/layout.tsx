@@ -10,8 +10,8 @@ const nunito = Nunito({
 });
 
 export const metadata: Metadata = {
-  title: "Research Study",
-  description: "CHI27 emotional support experiment",
+  title: "Research Study — Pilot",
+  description: "CHI27 pilot emotional support experiment",
 };
 
 export default function RootLayout({

@@ -1,1 +1,1 @@
-export const VALID_CODES = new Set(["STUDY2026", "PILOT2026"]);
+export const VALID_CODES = new Set(["PILOT2026", "LAB2026"]);

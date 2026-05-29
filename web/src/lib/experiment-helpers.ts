@@ -1,14 +1,27 @@
 import type { Condition, ExperimentState, ScenarioType } from "./types";
 
-export function currentScenarioType(state: ExperimentState): ScenarioType {
+export function currentScenarioType(
+  state: Pick<ExperimentState, "scenarioOrder" | "scenarioIndex">
+): ScenarioType {
   return state.scenarioOrder[state.scenarioIndex];
 }
 
-export function currentCondition(state: ExperimentState): Condition {
-  return state.conditionOrder[state.scenarioIndex];
+export function isExperiencedScenario(
+  state: Pick<ExperimentState, "scenarioIndex" | "experiencedScenarioIndex">
+): boolean {
+  return state.scenarioIndex === state.experiencedScenarioIndex;
 }
 
-export function resetScenarioChat(state: ExperimentState): Partial<ExperimentState> {
+export function currentCondition(
+  state: Pick<ExperimentState, "assignedCondition">
+): Condition {
+  return state.assignedCondition;
+}
+
+export function resetScenarioChat(): Pick<
+  ExperimentState,
+  "messages" | "turnCount" | "refusalDelivered"
+> {
   return {
     messages: [],
     turnCount: 0,
