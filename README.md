@@ -6,4 +6,4 @@ Access codes: `PILOT2026`, `LAB2026`
 
 Deploy root directory: `web/`
 
-**Live:** https://chi27-experiment-app.vercel.app
+**Live:** https://chi27-pilot-app.vercel.app
