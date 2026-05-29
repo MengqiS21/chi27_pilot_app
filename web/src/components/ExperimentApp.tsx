@@ -17,7 +17,6 @@ import {
   ShieldCheck,
   Sparkles,
   Users,
-  Bot,
   UserCircle,
 } from "lucide-react";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -35,6 +34,7 @@ import { SectionHeading } from "@/components/SectionHeading";
 import { CONSENT_TEXT } from "@/content/consent";
 import { SCENARIOS } from "@/content/scenarios";
 import {
+  DEMOGRAPHICS,
   SECTION_A,
   SECTION_A_KEYS,
   SECTION_B,
@@ -205,12 +205,24 @@ export function ExperimentApp() {
     }
   };
 
+  const enterScenario = async (index: number) => {
+    const experienced = index === state.experiencedScenarioIndex;
+    const stage = experienced ? "scenario_view" : "section_a";
+    await patchStage(stage, index);
+    setSectionA(emptyLikert(SECTION_A_KEYS));
+    setState((s) => ({
+      ...s,
+      stage,
+      scenarioIndex: index,
+      ...resetScenarioChat(),
+    }));
+  };
+
   const handleConsentContinue = async () => {
     setError(null);
     setLoading(true);
     try {
-      await patchStage("scenario_view", 0);
-      setState((s) => ({ ...s, stage: "scenario_view", scenarioIndex: 0 }));
+      await enterScenario(0);
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -225,27 +237,15 @@ export function ExperimentApp() {
       setState((s) => ({ ...s, stage: "section_c" }));
       return;
     }
-    await patchStage("scenario_view", nextIndex);
-    setState((s) => ({
-      ...s,
-      stage: "scenario_view",
-      scenarioIndex: nextIndex,
-      ...resetScenarioChat(),
-    }));
-    setSectionA(emptyLikert(SECTION_A_KEYS));
+    await enterScenario(nextIndex);
   };
 
   const handleScenarioViewContinue = async () => {
     setError(null);
     setLoading(true);
     try {
-      if (isExperiencedScenario(state)) {
-        await patchStage("scenario_chat", state.scenarioIndex);
-        setState((s) => ({ ...s, stage: "scenario_chat" }));
-      } else {
-        await patchStage("section_a", state.scenarioIndex);
-        setState((s) => ({ ...s, stage: "section_a" }));
-      }
+      await patchStage("scenario_chat", state.scenarioIndex);
+      setState((s) => ({ ...s, stage: "scenario_chat" }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -426,20 +426,15 @@ export function ExperimentApp() {
 
   const renderSectionA = () => (
     <>
-      <PageHeader
-        title="Scenario ratings"
-        lead={
-          isExperiencedScenario(state)
-            ? "Based on the scenario and conversation you just completed."
-            : "Based on the scenario you just read."
-        }
-        icon={Eye}
-      />
+      <PageHeader title={SECTION_A.title} icon={Eye} />
+      <div className="scenario-box">
+        {SCENARIOS[currentScenarioType(state)].text}
+      </div>
       <div className="card">
-        <p className="mb-6 text-[0.9375rem] text-muted">
+        <SectionHeading icon={Eye}>{SECTION_A.realism.title}</SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
           {SECTION_A.realism.instruction}
         </p>
-        <SectionHeading icon={Eye}>{SECTION_A.realism.title}</SectionHeading>
         <LikertBlock
           items={SECTION_A.realism.items.map((i) => i.text)}
           keys={SECTION_A.realism.items.map((i) => i.key)}
@@ -454,6 +449,9 @@ export function ExperimentApp() {
         <SectionHeading icon={HeartHandshake}>
           {SECTION_A.engagement.title}
         </SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_A.engagement.instruction}
+        </p>
         <LikertBlock
           items={SECTION_A.engagement.items.map((i) => i.text)}
           keys={SECTION_A.engagement.items.map((i) => i.key)}
@@ -466,6 +464,9 @@ export function ExperimentApp() {
         />
         <hr className="my-8 border-border" />
         <SectionHeading icon={Scale}>{SECTION_A.severity.title}</SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_A.severity.instruction}
+        </p>
         <LikertBlock
           items={SECTION_A.severity.items.map((i) => i.text)}
           keys={SECTION_A.severity.items.map((i) => i.key)}
@@ -491,18 +492,14 @@ export function ExperimentApp() {
 
   const renderSectionB = () => (
     <>
-      <PageHeader
-        title="Your experience with the AI"
-        lead="Please answer based on the conversation you just had."
-        icon={MessageSquare}
-      />
+      <PageHeader title={SECTION_B.title} icon={MessageSquare} />
       <div className="card">
-        <p className="mb-6 text-[0.9375rem] text-muted">
-          {SECTION_B.understanding.instruction}
-        </p>
         <SectionHeading icon={Compass}>
           {SECTION_B.understanding.title}
         </SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_B.understanding.instruction}
+        </p>
         <LikertBlock
           items={SECTION_B.understanding.items.map((i) => i.text)}
           keys={SECTION_B.understanding.items.map((i) => i.key)}
@@ -515,6 +512,9 @@ export function ExperimentApp() {
         />
         <hr className="my-8 border-border" />
         <SectionHeading icon={Users}>{SECTION_B.agency.title}</SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_B.agency.instruction}
+        </p>
         <LikertBlock
           items={SECTION_B.agency.items.map((i) => i.text)}
           keys={SECTION_B.agency.items.map((i) => i.key)}
@@ -527,6 +527,9 @@ export function ExperimentApp() {
         />
         <hr className="my-8 border-border" />
         <SectionHeading icon={Scale}>{SECTION_B.rupture.title}</SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_B.rupture.instruction}
+        </p>
         <LikertBlock
           items={SECTION_B.rupture.items.map((i) => i.text)}
           keys={SECTION_B.rupture.items.map((i) => i.key)}
@@ -538,27 +541,35 @@ export function ExperimentApp() {
           }
         />
         <hr className="my-8 border-border" />
-        <SectionHeading icon={Compass}>{SECTION_B.guidance.title}</SectionHeading>
+        <SectionHeading icon={Compass}>
+          {SECTION_B.manipulationCheck.title}
+        </SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_B.manipulationCheck.instruction}
+        </p>
+        <SectionHeading icon={Compass}>
+          {SECTION_B.manipulationCheck.guidance.title}
+        </SectionHeading>
         <LikertBlock
-          items={SECTION_B.guidance.items.map((i) => i.text)}
-          keys={SECTION_B.guidance.items.map((i) => i.key)}
+          items={SECTION_B.manipulationCheck.guidance.items.map((i) => i.text)}
+          keys={SECTION_B.manipulationCheck.guidance.items.map((i) => i.key)}
           values={sectionBLikert}
           namePrefix="b"
-          scale={SECTION_B.guidance.scale}
+          scale={SECTION_B.manipulationCheck.scale}
           onChange={(key, value) =>
             setSectionBLikert((prev) => ({ ...prev, [key]: value }))
           }
         />
         <hr className="my-8 border-border" />
         <SectionHeading icon={HeartHandshake}>
-          {SECTION_B.continuity.title}
+          {SECTION_B.manipulationCheck.continuity.title}
         </SectionHeading>
         <LikertBlock
-          items={SECTION_B.continuity.items.map((i) => i.text)}
-          keys={SECTION_B.continuity.items.map((i) => i.key)}
+          items={SECTION_B.manipulationCheck.continuity.items.map((i) => i.text)}
+          keys={SECTION_B.manipulationCheck.continuity.items.map((i) => i.key)}
           values={sectionBLikert}
           namePrefix="b"
-          scale={SECTION_B.continuity.scale}
+          scale={SECTION_B.manipulationCheck.scale}
           onChange={(key, value) =>
             setSectionBLikert((prev) => ({ ...prev, [key]: value }))
           }
@@ -735,18 +746,13 @@ export function ExperimentApp() {
             {SCENARIOS[currentScenarioType(state)].text}
           </div>
           <div className="card">
-            <p className="mb-6 text-[0.9375rem] text-muted">
-              {isExperiencedScenario(state)
-                ? "Please read the scenario above. On the next page you will have a short conversation with an AI, as if you were in this situation."
-                : "Please read the scenario above carefully. You will answer a few questions about it on the next page."}
-            </p>
             <button
               type="button"
               className="btn-primary inline-flex items-center gap-2"
               disabled={loading}
               onClick={() => void handleScenarioViewContinue()}
             >
-              Continue
+              Continue to conversation
               <ArrowRight size={18} strokeWidth={2} aria-hidden />
             </button>
           </div>
@@ -827,11 +833,7 @@ export function ExperimentApp() {
 
       {state.stage === "section_c" && (
         <>
-          <PageHeader
-            title="Your feedback"
-            lead="Help us improve the study materials."
-            icon={ClipboardPen}
-          />
+          <PageHeader title={SECTION_C.title} icon={ClipboardPen} />
           <div className="card">
             <OpenTextBlock
               items={SECTION_C.items}
@@ -856,11 +858,7 @@ export function ExperimentApp() {
 
       {state.stage === "demographics" && (
         <>
-          <PageHeader
-            title="About you"
-            lead="Almost done — a few final questions."
-            icon={UserCircle}
-          />
+          <PageHeader title={DEMOGRAPHICS.title} icon={UserCircle} />
           <div className="card">
             <DemographicsForm values={demographics} onChange={setDemographics} />
             <button

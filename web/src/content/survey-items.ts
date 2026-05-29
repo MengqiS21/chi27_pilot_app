@@ -1,3 +1,14 @@
+/** Pilot Study questionnaire — verbatim from Study Materials Part 1. */
+
+export const SCALE_INSTRUCTIONS = {
+  agree7:
+    "Response options (1–7): 1 = Strongly disagree · 2 = Disagree · 3 = Somewhat disagree · 4 = Neither agree nor disagree · 5 = Somewhat agree · 6 = Agree · 7 = Strongly agree.",
+  agree5:
+    "Response options (1–5): 1 = Strongly disagree · 2 = Disagree · 3 = Neither agree nor disagree · 4 = Agree · 5 = Strongly agree.",
+  severity7:
+    "Response options (1–7): 1 = Not at all serious · 2 = Slightly serious · 3 = Somewhat serious · 4 = Moderately serious · 5 = Quite serious · 6 = Very serious · 7 = Extremely serious.",
+} as const;
+
 export const SCREENING = {
   items: [
     {
@@ -22,11 +33,11 @@ export const SCREENING = {
 } as const;
 
 export const SECTION_A = {
+  title: "Scenario material validation",
   realism: {
     title: "Scenario realism",
     scale: "agree7" as const,
-    instruction:
-      "Please rate how much you agree with each statement (1 = Strongly disagree, 7 = Strongly agree).",
+    instruction: SCALE_INSTRUCTIONS.agree7,
     items: [
       { key: "rea1", text: "This scenario felt realistic to me." },
       {
@@ -39,8 +50,7 @@ export const SECTION_A = {
   engagement: {
     title: "Emotional engagement",
     scale: "agree7" as const,
-    instruction:
-      "Please rate how much you agree with each statement (1 = Strongly disagree, 7 = Strongly agree).",
+    instruction: SCALE_INSTRUCTIONS.agree7,
     items: [
       { key: "eng1", text: "I could easily imagine myself in this situation." },
       {
@@ -52,8 +62,7 @@ export const SECTION_A = {
   severity: {
     title: "Perceived severity",
     scale: "severity7" as const,
-    instruction:
-      "Please rate how serious you think the situation is (1 = Not at all serious, 7 = Extremely serious).",
+    instruction: SCALE_INSTRUCTIONS.severity7,
     items: [
       {
         key: "sev1",
@@ -64,11 +73,11 @@ export const SECTION_A = {
 } as const;
 
 export const SECTION_B = {
+  title: "Experienced scenario: appraisal, manipulation check, and perception",
   understanding: {
     title: "Perceived understanding of the redirection",
     scale: "agree5" as const,
-    instruction:
-      "Please rate how much you agree with each statement (1 = Strongly disagree, 5 = Strongly agree).",
+    instruction: SCALE_INSTRUCTIONS.agree5,
     items: [
       { key: "und1", text: "I understood why the AI responded the way it did." },
       {
@@ -81,6 +90,7 @@ export const SECTION_B = {
   agency: {
     title: "Perceived agency over what to do next",
     scale: "agree5" as const,
+    instruction: SCALE_INSTRUCTIONS.agree5,
     items: [
       {
         key: "agn1",
@@ -99,6 +109,7 @@ export const SECTION_B = {
   rupture: {
     title: "Perceived relational rupture",
     scale: "agree5" as const,
+    instruction: SCALE_INSTRUCTIONS.agree5,
     items: [
       { key: "rup1", text: "The AI's response felt cold and impersonal." },
       { key: "rup2", text: "I felt the AI was unwilling to help me." },
@@ -108,43 +119,46 @@ export const SECTION_B = {
       },
     ],
   },
-  guidance: {
-    title: "Actionable guidance check",
+  manipulationCheck: {
+    title: "Manipulation check",
     scale: "agree5" as const,
-    items: [
-      {
-        key: "mcg1",
-        text: "The AI gave me clear and specific information about where I could get help.",
-      },
-      {
-        key: "mcg2",
-        text: "The AI told me about a concrete next step I could take.",
-      },
-      {
-        key: "mcg3",
-        text: "The AI's suggestion about getting help was vague.",
-        reverseScored: true,
-      },
-    ],
-  },
-  continuity: {
-    title: "Support continuity check",
-    scale: "agree5" as const,
-    items: [
-      {
-        key: "mcc1",
-        text: "The AI's final response felt like a natural continuation of the conversation.",
-      },
-      {
-        key: "mcc2",
-        text: "The AI acknowledged what I had shared before redirecting me.",
-      },
-      {
-        key: "mcc3",
-        text: "The way the conversation ended felt abrupt.",
-        reverseScored: true,
-      },
-    ],
+    instruction: SCALE_INSTRUCTIONS.agree5,
+    guidance: {
+      title: "Actionable guidance check",
+      items: [
+        {
+          key: "mcg1",
+          text: "The AI gave me clear and specific information about where I could get help.",
+        },
+        {
+          key: "mcg2",
+          text: "The AI told me about a concrete next step I could take.",
+        },
+        {
+          key: "mcg3",
+          text: "The AI's suggestion about getting help was vague. (R)",
+          reverseScored: true,
+        },
+      ],
+    },
+    continuity: {
+      title: "Support continuity check",
+      items: [
+        {
+          key: "mcc1",
+          text: "The AI's final response felt like a natural continuation of the conversation.",
+        },
+        {
+          key: "mcc2",
+          text: "The AI acknowledged what I had shared before redirecting me.",
+        },
+        {
+          key: "mcc3",
+          text: "The way the conversation ended felt abrupt. (R)",
+          reverseScored: true,
+        },
+      ],
+    },
   },
   perception: {
     title: "Open perception of the redirection",
@@ -158,7 +172,7 @@ export const SECTION_B = {
 } as const;
 
 export const SECTION_C = {
-  title: "Item feedback",
+  title: "Item feedback form",
   items: [
     {
       key: "fb1",
@@ -175,142 +189,8 @@ export const SECTION_C = {
   ],
 } as const;
 
-export const PRE_MODERATORS = {
-  ai_reliance: {
-    title: "AI reliance",
-    scale: "agree5" as const,
-    instruction:
-      "Please rate how much you agree with each statement (1 = Strongly disagree, 5 = Strongly agree).",
-    items: [
-      {
-        key: "air1",
-        text: "I often turn to AI chat tools when I have something personal on my mind.",
-      },
-      {
-        key: "air2",
-        text: "When I am upset, talking things through with an AI is one of the first things I do.",
-      },
-      {
-        key: "air3",
-        text: "I use AI tools for emotional support more than most people I know.",
-      },
-    ],
-  },
-  social_support: {
-    title: "Social support level",
-    scale: "agree5" as const,
-    items: [
-      {
-        key: "soc1",
-        text: "There are people in my life I can turn to when I need emotional support.",
-      },
-      {
-        key: "soc2",
-        text: "If I were going through a hard time, I have someone I could talk to about it.",
-      },
-      {
-        key: "soc3",
-        text: "Overall, I feel I have a strong support network around me.",
-      },
-    ],
-  },
-  disclosure: {
-    title: "Disclosure comfort",
-    scale: "comfort5" as const,
-    instruction:
-      "How comfortable would you be discussing each of the following with an AI chat tool? (1 = Very uncomfortable, 5 = Very comfortable)",
-    items: [
-      { key: "dis1", text: "My deepest feelings." },
-      { key: "dis2", text: "What I like and dislike about myself." },
-      { key: "dis3", text: "My worst fears." },
-      { key: "dis4", text: "Things I have done that I feel guilty about." },
-      { key: "dis5", text: "What is important to me in life." },
-    ],
-  },
-} as const;
-
-export const POST_SURVEY = {
-  understanding: SECTION_B.understanding,
-  agency: SECTION_B.agency,
-  rupture: SECTION_B.rupture,
-  goal_disengagement: {
-    title: "Help-seeking goal disengagement",
-    scale: "agree5" as const,
-    instruction:
-      "Please rate how much you agree with each statement (1 = Strongly disagree, 5 = Strongly agree).",
-    items: [
-      {
-        key: "gdd1",
-        text: "After this response, I would be willing to give up on finding support for this issue.",
-      },
-      {
-        key: "gdd2",
-        text: "After this response, it would be easy for me to stop thinking about getting help for this.",
-      },
-      {
-        key: "gdd3",
-        text: "After this response, I would put less effort into looking for support for this issue.",
-      },
-      {
-        key: "gdd4",
-        text: "After this response, I would find it hard to let go of trying to get help for this.",
-        reverseScored: true,
-      },
-    ],
-  },
-  behavioral_choice: {
-    title: "Behavioral choice",
-    prompt:
-      "If you were in this situation, which one of the following would you be most likely to do next? (Select one.)",
-    options: [
-      {
-        key: "follow_resource",
-        label: "Follow the resource or suggestion the AI gave",
-        intentionPhrase: "follow the resource the AI suggested",
-      },
-      {
-        key: "talk_friend",
-        label: "Talk to a friend or family member",
-        intentionPhrase: "talk to a friend or family member",
-      },
-      {
-        key: "seek_professional",
-        label: "Seek professional support, such as a counsellor or therapist",
-        intentionPhrase: "seek professional support",
-      },
-      {
-        key: "retry_same_ai",
-        label: "Go back and try the same AI again",
-        intentionPhrase: "go back and try the same AI again",
-      },
-      {
-        key: "try_different_ai",
-        label: "Try a different AI or app",
-        intentionPhrase: "try a different AI or app",
-      },
-      {
-        key: "manage_alone",
-        label: "Manage it on my own",
-        intentionPhrase: "manage it on my own",
-      },
-    ],
-  },
-  intention: {
-    title: "Intention toward the selected option",
-    scale: "intention7" as const,
-    instruction:
-      "Please rate how much you agree with each statement (1 = Strongly disagree, 7 = Strongly agree).",
-    templates: [
-      { key: "int1", text: "I intend to [selected option]." },
-      { key: "int2", text: "I plan to [selected option]." },
-      { key: "int3", text: "I am likely to [selected option] in the near future." },
-    ],
-  },
-  guidance: SECTION_B.guidance,
-  continuity: SECTION_B.continuity,
-} as const;
-
 export const DEMOGRAPHICS = {
+  title: "Demographic information",
   age: {
     key: "dem1",
     label: "What is your age?",
@@ -386,7 +266,7 @@ export const DEMOGRAPHICS = {
   },
 } as const;
 
-export function allLikertKeys(
+function allLikertKeys(
   sections: Array<{ items: ReadonlyArray<{ key: string }> }>
 ): string[] {
   return sections.flatMap((s) => s.items.map((i) => i.key));
@@ -402,21 +282,6 @@ export const SECTION_B_LIKERT_KEYS = allLikertKeys([
   SECTION_B.understanding,
   SECTION_B.agency,
   SECTION_B.rupture,
-  SECTION_B.guidance,
-  SECTION_B.continuity,
-]);
-
-export const PRE_MODERATOR_KEYS = allLikertKeys([
-  PRE_MODERATORS.ai_reliance,
-  PRE_MODERATORS.social_support,
-  PRE_MODERATORS.disclosure,
-]);
-
-export const POST_SURVEY_LIKERT_KEYS = allLikertKeys([
-  POST_SURVEY.understanding,
-  POST_SURVEY.agency,
-  POST_SURVEY.rupture,
-  POST_SURVEY.goal_disengagement,
-  POST_SURVEY.guidance,
-  POST_SURVEY.continuity,
+  SECTION_B.manipulationCheck.guidance,
+  SECTION_B.manipulationCheck.continuity,
 ]);

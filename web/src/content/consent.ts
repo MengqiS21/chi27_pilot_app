@@ -18,5 +18,5 @@ time by closing the browser without penalty.
 
 Contact: If you have questions, contact [researcher email].
 
-By checking the box below, you confirm that you are at least 18 years old,
+By checking the box below, you confirm that you are at least 21 years old,
 have read this information, and consent to participate.`;
