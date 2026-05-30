@@ -159,9 +159,6 @@ export function ExperimentApp() {
       setState((s) => ({
         ...s,
         participantId: data.participantId,
-        scenarioOrder: data.scenarioOrder,
-        experiencedScenarioIndex: data.experiencedScenarioIndex,
-        assignedCondition: data.assignedCondition,
         scenarioIndex: 0,
         stage: "screening",
       }));
@@ -222,7 +219,32 @@ export function ExperimentApp() {
     setError(null);
     setLoading(true);
     try {
-      await enterScenario(0);
+      const res = await fetch("/api/assign", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ participantId: state.participantId }),
+      });
+      const data = await res.json();
+      if (!res.ok) throw new Error(data.error ?? "Could not assign condition");
+
+      const nextState = {
+        scenarioOrder: data.scenarioOrder as ExperimentState["scenarioOrder"],
+        experiencedScenarioIndex: data.experiencedScenarioIndex as number,
+        assignedCondition: data.assignedCondition as ExperimentState["assignedCondition"],
+      };
+
+      const experienced =
+        0 === data.experiencedScenarioIndex;
+      const stage = experienced ? "scenario_view" : "section_a";
+      await patchStage(stage, 0);
+      setSectionA(emptyLikert(SECTION_A_KEYS));
+      setState((s) => ({
+        ...s,
+        ...nextState,
+        stage,
+        scenarioIndex: 0,
+        ...resetScenarioChat(),
+      }));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {

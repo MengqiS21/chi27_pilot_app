@@ -24,10 +24,10 @@ function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
-export function assignPilot(count: number) {
+export function assignPilot(enrolledCount: number) {
   const scenarioOrder = shuffle(PILOT_SCENARIO_TYPES);
   const experiencedScenarioIndex = Math.floor(Math.random() * 3);
-  const assignedCondition = CONDITIONS[count % 4];
+  const assignedCondition = CONDITIONS[enrolledCount % 4];
 
   return {
     study: "pilot" as const,
