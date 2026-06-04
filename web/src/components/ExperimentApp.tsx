@@ -11,15 +11,13 @@ import {
   HeartHandshake,
   KeyRound,
   MessageSquare,
-  MessagesSquare,
   Scale,
-  Send,
   ShieldCheck,
   Sparkles,
   Users,
   UserCircle,
 } from "lucide-react";
-import { ChatPanel } from "@/components/ChatPanel";
+import { ChatShell } from "@/components/ChatShell";
 import {
   DemographicsForm,
   emptyDemographics,
@@ -50,6 +48,7 @@ import {
 } from "@/lib/experiment-helpers";
 import { STUDY } from "@/lib/study-config";
 import { INITIAL_STATE, type ExperimentState } from "@/lib/types";
+import { useFadeTransition } from "@/lib/use-fade-transition";
 
 function emptyLikert(keys: readonly string[]): Record<string, number | null> {
   return Object.fromEntries(keys.map((k) => [k, null]));
@@ -93,6 +92,7 @@ export function ExperimentApp() {
   );
 
   const [chatInput, setChatInput] = useState("");
+  const { visible: stageVisible, run: withStageFade } = useFadeTransition();
 
   const patchStage = useCallback(
     async (stage: string, scenarioIndex?: number) => {
@@ -205,14 +205,16 @@ export function ExperimentApp() {
   const enterScenario = async (index: number) => {
     const experienced = index === state.experiencedScenarioIndex;
     const stage = experienced ? "scenario_view" : "section_a";
-    await patchStage(stage, index);
-    setSectionA(emptyLikert(SECTION_A_KEYS));
-    setState((s) => ({
-      ...s,
-      stage,
-      scenarioIndex: index,
-      ...resetScenarioChat(),
-    }));
+    await withStageFade(async () => {
+      await patchStage(stage, index);
+      setSectionA(emptyLikert(SECTION_A_KEYS));
+      setState((s) => ({
+        ...s,
+        stage,
+        scenarioIndex: index,
+        ...resetScenarioChat(),
+      }));
+    });
   };
 
   const handleConsentContinue = async () => {
@@ -233,18 +235,19 @@ export function ExperimentApp() {
         assignedCondition: data.assignedCondition as ExperimentState["assignedCondition"],
       };
 
-      const experienced =
-        0 === data.experiencedScenarioIndex;
+      const experienced = 0 === data.experiencedScenarioIndex;
       const stage = experienced ? "scenario_view" : "section_a";
-      await patchStage(stage, 0);
-      setSectionA(emptyLikert(SECTION_A_KEYS));
-      setState((s) => ({
-        ...s,
-        ...nextState,
-        stage,
-        scenarioIndex: 0,
-        ...resetScenarioChat(),
-      }));
+      await withStageFade(async () => {
+        await patchStage(stage, 0);
+        setSectionA(emptyLikert(SECTION_A_KEYS));
+        setState((s) => ({
+          ...s,
+          ...nextState,
+          stage,
+          scenarioIndex: 0,
+          ...resetScenarioChat(),
+        }));
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -266,8 +269,10 @@ export function ExperimentApp() {
     setError(null);
     setLoading(true);
     try {
-      await patchStage("scenario_chat", state.scenarioIndex);
-      setState((s) => ({ ...s, stage: "scenario_chat" }));
+      await withStageFade(async () => {
+        await patchStage("scenario_chat", state.scenarioIndex);
+        setState((s) => ({ ...s, stage: "scenario_chat" }));
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -322,8 +327,10 @@ export function ExperimentApp() {
     setError(null);
     setLoading(true);
     try {
-      await patchStage("section_a", state.scenarioIndex);
-      setState((s) => ({ ...s, stage: "section_a" }));
+      await withStageFade(async () => {
+        await patchStage("section_a", state.scenarioIndex);
+        setState((s) => ({ ...s, stage: "section_a" }));
+      });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
     } finally {
@@ -621,8 +628,13 @@ export function ExperimentApp() {
     </>
   );
 
+  const scenarioType = currentScenarioType(state);
+  const scenario = SCENARIOS[scenarioType];
+
   return (
-    <main className="page-shell">
+    <main
+      className={`page-shell ${state.stage === "scenario_chat" ? "page-shell-chat" : ""}`}
+    >
       {showProgress ? <ProgressBar current={progressStep} total={3} /> : null}
 
       {error ? (
@@ -762,95 +774,56 @@ export function ExperimentApp() {
       )}
 
       {state.stage === "scenario_view" && state.scenarioOrder.length > 0 && (
-        <>
-          <PageHeader title={SCENARIOS[currentScenarioType(state)].title} />
-          <div className="scenario-box">
-            {SCENARIOS[currentScenarioType(state)].text}
-          </div>
-          <div className="card">
+        <div
+          className={`stage-transition ${stageVisible ? "stage-transition-visible" : ""}`}
+        >
+          <PageHeader title={scenario.title} />
+          <div className="card scenario-intro">
+            <div className="scenario-box scenario-box-intro">{scenario.text}</div>
+            <p className="scenario-intro-lead">
+              On the next screen you will chat with an Assistant about this
+              situation. Take a moment to read the scenario, then start when
+              you feel ready.
+            </p>
             <button
               type="button"
               className="btn-primary inline-flex items-center gap-2"
               disabled={loading}
               onClick={() => void handleScenarioViewContinue()}
             >
-              Continue to conversation
+              Start conversation
               <ArrowRight size={18} strokeWidth={2} aria-hidden />
             </button>
           </div>
-        </>
+        </div>
       )}
 
       {state.stage === "scenario_chat" && state.scenarioOrder.length > 0 && (
-        <>
-          <PageHeader title={SCENARIOS[currentScenarioType(state)].title} />
-          <div className="scenario-box">
-            {SCENARIOS[currentScenarioType(state)].text}
-          </div>
-          <div className="card">
-            <p className="mb-1 flex items-center gap-2 text-base font-semibold text-ink">
-              <MessagesSquare
-                size={20}
-                strokeWidth={2}
-                className="shrink-0 text-accent"
-                aria-hidden
-              />
-              Conversation with the AI
-            </p>
-            <p className="mb-6 text-[0.9375rem] text-muted">
-              Share what you might say in this situation. The AI will respond
-              after each message.
-            </p>
-            <ChatPanel messages={state.messages} />
-            {state.refusalDelivered ? (
-              <button
-                type="button"
-                className="btn-primary inline-flex items-center gap-2"
-                disabled={loading}
-                onClick={() => void handleContinueToSectionA()}
-              >
-                Continue to questions
-                <ArrowRight size={18} strokeWidth={2} aria-hidden />
-              </button>
-            ) : (
-              <form
-                className="mt-4"
-                onSubmit={(e) => {
-                  e.preventDefault();
-                  void handleSendMessage();
-                }}
-              >
-                <label className="field-label" htmlFor="chat-input">
-                  Your message
-                </label>
-                <div className="flex flex-col gap-3 sm:flex-row sm:items-end">
-                  <textarea
-                    id="chat-input"
-                    className="field-input min-h-[88px] flex-1 resize-y"
-                    rows={3}
-                    value={chatInput}
-                    onChange={(e) => setChatInput(e.target.value)}
-                    placeholder="Type here…"
-                    disabled={loading}
-                  />
-                  <button
-                    type="submit"
-                    className="btn-primary inline-flex shrink-0 items-center gap-2"
-                    disabled={loading || !chatInput.trim()}
-                  >
-                    {loading ? "AI is typing…" : "Send"}
-                    {!loading ? (
-                      <Send size={18} strokeWidth={2} aria-hidden />
-                    ) : null}
-                  </button>
-                </div>
-              </form>
-            )}
-          </div>
-        </>
+        <div
+          className={`stage-transition ${stageVisible ? "stage-transition-visible" : ""}`}
+        >
+          <ChatShell
+            scenarioTitle={scenario.title}
+            scenarioText={scenario.text}
+            messages={state.messages}
+            input={chatInput}
+            onInputChange={setChatInput}
+            onSend={() => void handleSendMessage()}
+            isLoading={loading}
+            refusalDelivered={state.refusalDelivered}
+            onContinue={() => void handleContinueToSectionA()}
+            continueLabel="Continue to questions"
+          />
+        </div>
       )}
 
-      {state.stage === "section_a" && renderSectionA()}
+      {state.stage === "section_a" && (
+        <div
+          className={`stage-transition ${stageVisible ? "stage-transition-visible" : ""}`}
+        >
+          {renderSectionA()}
+        </div>
+      )}
       {state.stage === "section_b" && renderSectionB()}
 
       {state.stage === "section_c" && (
