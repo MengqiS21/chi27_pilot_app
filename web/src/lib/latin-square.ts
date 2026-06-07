@@ -3,19 +3,19 @@ import type { Condition, ScenarioType } from "./types";
 const LATIN_SQUARE: { conditions: Condition[]; scenarios: ScenarioType[] }[] = [
   {
     conditions: ["A", "B", "C", "D"],
-    scenarios: ["temporal", "relational", "face", "grief"],
+    scenarios: ["scenario_1", "scenario_2", "scenario_3", "grief"],
   },
   {
     conditions: ["B", "C", "D", "A"],
-    scenarios: ["relational", "face", "grief", "temporal"],
+    scenarios: ["scenario_2", "scenario_3", "grief", "scenario_1"],
   },
   {
     conditions: ["C", "D", "A", "B"],
-    scenarios: ["face", "grief", "temporal", "relational"],
+    scenarios: ["scenario_3", "grief", "scenario_1", "scenario_2"],
   },
   {
     conditions: ["D", "A", "B", "C"],
-    scenarios: ["grief", "temporal", "relational", "face"],
+    scenarios: ["grief", "scenario_1", "scenario_2", "scenario_3"],
   },
 ];
 

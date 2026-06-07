@@ -3,7 +3,8 @@ export type ScalePreset =
   | "agree5"
   | "severity7"
   | "comfort5"
-  | "intention7";
+  | "intention7"
+  | "timing5";
 
 export type ScaleConfig = {
   values: readonly number[];
@@ -39,6 +40,12 @@ const COMFORT5_MIDDLE: Partial<Record<number, string>> = {
   2: "Somewhat uncomfortable",
   3: "Neither comfortable nor uncomfortable",
   4: "Somewhat comfortable",
+};
+
+const TIMING5_MIDDLE: Partial<Record<number, string>> = {
+  2: "A little too early",
+  3: "About right",
+  4: "A little too late",
 };
 
 export const SCALE_PRESETS: Record<ScalePreset, ScaleConfig> = {
@@ -129,6 +136,23 @@ export const SCALE_PRESETS: Record<ScalePreset, ScaleConfig> = {
         "5 — Somewhat agree",
         "6 — Agree",
         "7 — Strongly agree",
+      ];
+      return labels[n] ?? String(n);
+    },
+  },
+  timing5: {
+    values: [1, 2, 3, 4, 5],
+    lowLabel: "Much too early",
+    highLabel: "Much too late",
+    middleLabels: TIMING5_MIDDLE,
+    ariaLabel: (n) => {
+      const labels = [
+        "",
+        "1 — Much too early",
+        "2 — A little too early",
+        "3 — About right",
+        "4 — A little too late",
+        "5 — Much too late",
       ];
       return labels[n] ?? String(n);
     },

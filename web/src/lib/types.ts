@@ -18,8 +18,13 @@ export type ChatMessage = {
   content: string;
 };
 
-export type ScenarioType = "temporal" | "relational" | "face" | "grief";
+export type ScenarioType =
+  | "scenario_1"
+  | "scenario_2"
+  | "scenario_3"
+  | "grief";
 export type Condition = "A" | "B" | "C" | "D";
+export type PilotGroup = "group_1" | "group_2";
 export type StudyType = "pilot" | "phase1";
 
 export type ExperimentState = {
@@ -29,7 +34,9 @@ export type ExperimentState = {
   scenarioIndex: number;
   scenarioOrder: ScenarioType[];
   experiencedScenarioIndex: number;
-  assignedCondition: Condition;
+  interactionScenario: ScenarioType | null;
+  pilotGroup: PilotGroup | null;
+  assignedCondition: Condition | null;
   messages: ChatMessage[];
   turnCount: number;
   refusalDelivered: boolean;
@@ -42,7 +49,9 @@ export const INITIAL_STATE: ExperimentState = {
   scenarioIndex: 0,
   scenarioOrder: [],
   experiencedScenarioIndex: 0,
-  assignedCondition: "A",
+  interactionScenario: null,
+  pilotGroup: null,
+  assignedCondition: null,
   messages: [],
   turnCount: 0,
   refusalDelivered: false,

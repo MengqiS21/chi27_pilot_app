@@ -152,15 +152,16 @@
   }
 
   .likert-scale-wrap {
-    @apply flex w-full justify-center;
+    @apply w-full;
   }
 
   .likert-scale {
-    @apply flex max-w-full flex-wrap items-end justify-center gap-x-1 overflow-visible sm:gap-x-2;
+    @apply grid w-full items-end overflow-visible;
+    column-gap: clamp(0.5rem, 2.5vw, 1.25rem);
   }
 
   .likert-scale-cell {
-    @apply relative flex shrink-0 flex-col items-center overflow-visible;
+    @apply relative flex min-w-0 flex-col items-center overflow-visible;
   }
 
   .likert-hint {
@@ -363,7 +364,7 @@
   }
 
   .chat-message-user {
-    @apply ml-auto flex-row-reverse items-end;
+    @apply ml-auto items-end;
   }
 
   .chat-message-assistant {

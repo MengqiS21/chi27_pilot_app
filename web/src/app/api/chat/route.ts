@@ -1,7 +1,8 @@
 import { NextResponse } from "next/server";
 import { getAiResponse } from "@/lib/anthropic";
-import { getSupabase } from "@/lib/supabase";
-import type { ChatMessage } from "@/lib/types";
+import { saveConversationTurn } from "@/lib/conversation-store";
+import { maxUserTurnsForGroup } from "@/lib/study-config";
+import type { ChatMessage, Condition, PilotGroup } from "@/lib/types";
 
 export async function POST(request: Request) {
   try {
@@ -10,6 +11,7 @@ export async function POST(request: Request) {
       participantId,
       messages,
       condition,
+      pilotGroup,
       scenarioType,
       scenarioIndex,
       turnCount,
@@ -17,7 +19,8 @@ export async function POST(request: Request) {
     } = body as {
       participantId: string;
       messages: ChatMessage[];
-      condition: string;
+      condition: Condition | null;
+      pilotGroup: PilotGroup;
       scenarioType: string;
       scenarioIndex: number;
       turnCount: number;
@@ -29,7 +32,11 @@ export async function POST(request: Request) {
       { role: "user", content: userContent },
     ];
 
-    const assistantText = await getAiResponse(pending, condition, turnCount);
+    const assistantText = await getAiResponse(pending, {
+      pilotGroup,
+      condition,
+      turnCount,
+    });
 
     if (!assistantText) {
       return NextResponse.json(
@@ -38,36 +45,26 @@ export async function POST(request: Request) {
       );
     }
 
-    const supabase = getSupabase();
-    const rows = [
-      {
-        participant_id: participantId,
-        scenario_index: scenarioIndex,
-        scenario_type: scenarioType,
-        condition,
-        turn_index: turnCount,
-        role: "user",
-        content: userContent,
-      },
-      {
-        participant_id: participantId,
-        scenario_index: scenarioIndex,
-        scenario_type: scenarioType,
-        condition,
-        turn_index: turnCount,
-        role: "assistant",
-        content: assistantText,
-      },
-    ];
+    const maxTurns = maxUserTurnsForGroup(pilotGroup);
+    const conversationEnded = turnCount >= maxTurns;
+    const storedCondition = condition ?? "none";
 
-    const { error: dbError } = await supabase.from("conversations").insert(rows);
+    const dbError = await saveConversationTurn({
+      participantId,
+      scenarioIndex,
+      scenarioType,
+      condition: storedCondition,
+      turnCount,
+      userContent,
+      assistantText,
+    });
     if (dbError) {
-      console.error("Failed to save messages:", dbError.message);
+      console.error("Failed to save conversation:", dbError);
     }
 
     return NextResponse.json({
       assistantText,
-      refusalDelivered: turnCount >= 3,
+      refusalDelivered: conversationEnded,
     });
   } catch (e) {
     const message = e instanceof Error ? e.message : "Unknown error";

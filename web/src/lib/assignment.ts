@@ -1,15 +1,17 @@
+import type { PilotAllocationSlot } from "@/lib/pilot-allocation";
+import { LABEL_TO_CONDITION } from "@/lib/study-config";
 import type { Condition, ScenarioType } from "./types";
 
 export const PILOT_SCENARIO_TYPES: ScenarioType[] = [
-  "temporal",
-  "relational",
-  "face",
+  "scenario_1",
+  "scenario_2",
+  "scenario_3",
 ];
 
 export const PHASE1_SCENARIO_TYPES: ScenarioType[] = [
-  "temporal",
-  "relational",
-  "face",
+  "scenario_1",
+  "scenario_2",
+  "scenario_3",
   "grief",
 ];
 
@@ -24,24 +26,36 @@ function shuffle<T>(arr: T[]): T[] {
   return copy;
 }
 
-export function assignPilot(enrolledCount: number) {
+export function assignPilot(
+  enrolledCount: number,
+  allocationSlot: PilotAllocationSlot
+) {
+  const interactionScenario = PILOT_SCENARIO_TYPES[enrolledCount % 3];
   const scenarioOrder = shuffle(PILOT_SCENARIO_TYPES);
-  const experiencedScenarioIndex = Math.floor(Math.random() * 3);
-  const assignedCondition = CONDITIONS[enrolledCount % 4];
+  const experiencedScenarioIndex = scenarioOrder.indexOf(interactionScenario);
+
+  const assignedCondition: Condition | null = allocationSlot.conditionLabel
+    ? LABEL_TO_CONDITION[allocationSlot.conditionLabel]
+    : null;
 
   return {
     study: "pilot" as const,
+    pilotGroup: allocationSlot.pilotGroup,
+    allocationSlotIndex: enrolledCount,
     scenarioOrder,
     experiencedScenarioIndex,
+    interactionScenario,
     assignedCondition,
-    conditionOrder: [assignedCondition],
+    conditionLabel: allocationSlot.conditionLabel,
+    conditionOrder: assignedCondition ? [assignedCondition] : [],
   };
 }
 
 export function assignPhase1(count: number) {
   const scenarioIndex = count % PHASE1_SCENARIO_TYPES.length;
   const scenarioType = PHASE1_SCENARIO_TYPES[scenarioIndex];
-  const assignedCondition = CONDITIONS[Math.floor(count / PHASE1_SCENARIO_TYPES.length) % 4];
+  const assignedCondition =
+    CONDITIONS[Math.floor(count / PHASE1_SCENARIO_TYPES.length) % 4];
 
   return {
     study: "phase1" as const,

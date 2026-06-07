@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import {
   ArrowRight,
   CheckCircle2,
@@ -30,25 +30,26 @@ import { PageHeader } from "@/components/PageHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { SectionHeading } from "@/components/SectionHeading";
 import { CONSENT_TEXT } from "@/content/consent";
-import { SCENARIOS } from "@/content/scenarios";
+import { SCENARIOS, USER_TASK_INSTRUCTIONS } from "@/content/scenarios";
 import {
   DEMOGRAPHICS,
   SECTION_A,
   SECTION_A_KEYS,
   SECTION_B,
-  SECTION_B_LIKERT_KEYS,
+  SECTION_B_LIKERT_KEYS_GROUP_2,
   SECTION_C,
   SCREENING,
+  sectionBLikertKeysForGroup,
 } from "@/content/survey-items";
 import {
   currentCondition,
   currentScenarioType,
-  isExperiencedScenario,
+  isGroup2,
   resetScenarioChat,
 } from "@/lib/experiment-helpers";
-import { STUDY } from "@/lib/study-config";
+import { STUDY, maxUserTurnsForGroup } from "@/lib/study-config";
 import { INITIAL_STATE, type ExperimentState } from "@/lib/types";
-import { useFadeTransition } from "@/lib/use-fade-transition";
+import { scrollPageToTop, useFadeTransition } from "@/lib/use-fade-transition";
 
 function emptyLikert(keys: readonly string[]): Record<string, number | null> {
   return Object.fromEntries(keys.map((k) => [k, null]));
@@ -79,7 +80,7 @@ export function ExperimentApp() {
   const [screening, setScreening] = useState<Record<string, string>>({});
   const [sectionA, setSectionA] = useState(() => emptyLikert(SECTION_A_KEYS));
   const [sectionBLikert, setSectionBLikert] = useState(() =>
-    emptyLikert(SECTION_B_LIKERT_KEYS)
+    emptyLikert(SECTION_B_LIKERT_KEYS_GROUP_2)
   );
   const [sectionBText, setSectionBText] = useState(() =>
     emptyText(SECTION_B.perception.items.map((i) => i.key))
@@ -93,6 +94,10 @@ export function ExperimentApp() {
 
   const [chatInput, setChatInput] = useState("");
   const { visible: stageVisible, run: withStageFade } = useFadeTransition();
+
+  useEffect(() => {
+    scrollPageToTop();
+  }, [state.stage, state.scenarioIndex]);
 
   const patchStage = useCallback(
     async (stage: string, scenarioIndex?: number) => {
@@ -202,16 +207,26 @@ export function ExperimentApp() {
     }
   };
 
-  const enterScenario = async (index: number) => {
-    const experienced = index === state.experiencedScenarioIndex;
-    const stage = experienced ? "scenario_view" : "section_a";
+  const enterScenarioSectionA = async (index: number) => {
     await withStageFade(async () => {
-      await patchStage(stage, index);
+      await patchStage("section_a", index);
       setSectionA(emptyLikert(SECTION_A_KEYS));
       setState((s) => ({
         ...s,
-        stage,
+        stage: "section_a",
         scenarioIndex: index,
+      }));
+    });
+  };
+
+  const goToInteractionPrep = async () => {
+    const chatIndex = state.experiencedScenarioIndex;
+    await withStageFade(async () => {
+      await patchStage("scenario_view", chatIndex);
+      setState((s) => ({
+        ...s,
+        stage: "scenario_view",
+        scenarioIndex: chatIndex,
         ...resetScenarioChat(),
       }));
     });
@@ -232,18 +247,23 @@ export function ExperimentApp() {
       const nextState = {
         scenarioOrder: data.scenarioOrder as ExperimentState["scenarioOrder"],
         experiencedScenarioIndex: data.experiencedScenarioIndex as number,
-        assignedCondition: data.assignedCondition as ExperimentState["assignedCondition"],
+        interactionScenario:
+          data.interactionScenario as ExperimentState["interactionScenario"],
+        pilotGroup: data.pilotGroup as ExperimentState["pilotGroup"],
+        assignedCondition:
+          data.assignedCondition as ExperimentState["assignedCondition"],
       };
 
-      const experienced = 0 === data.experiencedScenarioIndex;
-      const stage = experienced ? "scenario_view" : "section_a";
+      const bKeys = sectionBLikertKeysForGroup(nextState.pilotGroup);
+      setSectionBLikert(emptyLikert(bKeys));
+
       await withStageFade(async () => {
-        await patchStage(stage, 0);
+        await patchStage("section_a", 0);
         setSectionA(emptyLikert(SECTION_A_KEYS));
         setState((s) => ({
           ...s,
           ...nextState,
-          stage,
+          stage: "section_a",
           scenarioIndex: 0,
           ...resetScenarioChat(),
         }));
@@ -253,16 +273,6 @@ export function ExperimentApp() {
     } finally {
       setLoading(false);
     }
-  };
-
-  const goToNextScenarioOrSectionC = async () => {
-    const nextIndex = state.scenarioIndex + 1;
-    if (nextIndex >= state.scenarioOrder.length) {
-      await patchStage("section_c");
-      setState((s) => ({ ...s, stage: "section_c" }));
-      return;
-    }
-    await enterScenario(nextIndex);
   };
 
   const handleScenarioViewContinue = async () => {
@@ -282,11 +292,19 @@ export function ExperimentApp() {
 
   const handleSendMessage = async () => {
     const text = chatInput.trim();
-    if (!text || loading || state.refusalDelivered) return;
+    if (!text || loading || state.refusalDelivered || !state.pilotGroup) return;
 
     setError(null);
-    setLoading(true);
+    const priorMessages = state.messages;
     const nextTurn = state.turnCount + 1;
+    const maxTurns = maxUserTurnsForGroup(state.pilotGroup);
+
+    setChatInput("");
+    setState((s) => ({
+      ...s,
+      messages: [...s.messages, { role: "user", content: text }],
+    }));
+    setLoading(true);
 
     try {
       const res = await fetch("/api/chat", {
@@ -294,8 +312,9 @@ export function ExperimentApp() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           participantId: state.participantId,
-          messages: state.messages,
+          messages: priorMessages,
           condition: currentCondition(state),
+          pilotGroup: state.pilotGroup,
           scenarioType: currentScenarioType(state),
           scenarioIndex: state.scenarioIndex,
           turnCount: nextTurn,
@@ -309,27 +328,27 @@ export function ExperimentApp() {
         ...s,
         messages: [
           ...s.messages,
-          { role: "user", content: text },
           { role: "assistant", content: data.assistantText },
         ],
         turnCount: nextTurn,
-        refusalDelivered: data.refusalDelivered ?? nextTurn >= 3,
+        refusalDelivered: data.refusalDelivered ?? nextTurn >= maxTurns,
       }));
-      setChatInput("");
     } catch (e) {
+      setState((s) => ({ ...s, messages: priorMessages }));
+      setChatInput(text);
       setError(e instanceof Error ? e.message : "Could not get a response from the AI.");
     } finally {
       setLoading(false);
     }
   };
 
-  const handleContinueToSectionA = async () => {
+  const handleContinueToSectionB = async () => {
     setError(null);
     setLoading(true);
     try {
       await withStageFade(async () => {
-        await patchStage("section_a", state.scenarioIndex);
-        setState((s) => ({ ...s, stage: "section_a" }));
+        await patchStage("section_b", state.scenarioIndex);
+        setState((s) => ({ ...s, stage: "section_b" }));
       });
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
@@ -354,11 +373,11 @@ export function ExperimentApp() {
         scenarioType: currentScenarioType(state),
       });
 
-      if (isExperiencedScenario(state)) {
-        await patchStage("section_b", state.scenarioIndex);
-        setState((s) => ({ ...s, stage: "section_b" }));
+      const nextIndex = state.scenarioIndex + 1;
+      if (nextIndex < state.scenarioOrder.length) {
+        await enterScenarioSectionA(nextIndex);
       } else {
-        await goToNextScenarioOrSectionC();
+        await goToInteractionPrep();
       }
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
@@ -369,7 +388,8 @@ export function ExperimentApp() {
 
   const handleSectionBSubmit = async () => {
     setError(null);
-    if (!allLikertAnswered(sectionBLikert, SECTION_B_LIKERT_KEYS)) {
+    const bKeys = sectionBLikertKeysForGroup(state.pilotGroup);
+    if (!allLikertAnswered(sectionBLikert, bKeys)) {
       setError("Please answer all items before continuing.");
       return;
     }
@@ -386,8 +406,9 @@ export function ExperimentApp() {
         scenarioIndex: state.scenarioIndex,
         scenarioType: currentScenarioType(state),
       });
-      await goToNextScenarioOrSectionC();
-      setSectionBLikert(emptyLikert(SECTION_B_LIKERT_KEYS));
+      await patchStage("section_c");
+      setState((s) => ({ ...s, stage: "section_c" }));
+      setSectionBLikert(emptyLikert(bKeys));
       setSectionBText(emptyText(SECTION_B.perception.items.map((i) => i.key)));
     } catch (e) {
       setError(e instanceof Error ? e.message : "Error");
@@ -555,54 +576,74 @@ export function ExperimentApp() {
           }
         />
         <hr className="my-8 border-border" />
-        <SectionHeading icon={Scale}>{SECTION_B.rupture.title}</SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_B.rupture.instruction}
-        </p>
-        <LikertBlock
-          items={SECTION_B.rupture.items.map((i) => i.text)}
-          keys={SECTION_B.rupture.items.map((i) => i.key)}
-          values={sectionBLikert}
-          namePrefix="b"
-          scale={SECTION_B.rupture.scale}
-          onChange={(key, value) =>
-            setSectionBLikert((prev) => ({ ...prev, [key]: value }))
-          }
-        />
-        <hr className="my-8 border-border" />
-        <SectionHeading icon={Compass}>
-          {SECTION_B.manipulationCheck.title}
-        </SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_B.manipulationCheck.instruction}
-        </p>
-        <SectionHeading icon={Compass}>
-          {SECTION_B.manipulationCheck.guidance.title}
-        </SectionHeading>
-        <LikertBlock
-          items={SECTION_B.manipulationCheck.guidance.items.map((i) => i.text)}
-          keys={SECTION_B.manipulationCheck.guidance.items.map((i) => i.key)}
-          values={sectionBLikert}
-          namePrefix="b"
-          scale={SECTION_B.manipulationCheck.scale}
-          onChange={(key, value) =>
-            setSectionBLikert((prev) => ({ ...prev, [key]: value }))
-          }
-        />
-        <hr className="my-8 border-border" />
         <SectionHeading icon={HeartHandshake}>
-          {SECTION_B.manipulationCheck.continuity.title}
+          {SECTION_B.continuity.title}
         </SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_B.continuity.instruction}
+        </p>
         <LikertBlock
-          items={SECTION_B.manipulationCheck.continuity.items.map((i) => i.text)}
-          keys={SECTION_B.manipulationCheck.continuity.items.map((i) => i.key)}
+          items={SECTION_B.continuity.items.map((i) => i.text)}
+          keys={SECTION_B.continuity.items.map((i) => i.key)}
           values={sectionBLikert}
           namePrefix="b"
-          scale={SECTION_B.manipulationCheck.scale}
+          scale={SECTION_B.continuity.scale}
           onChange={(key, value) =>
             setSectionBLikert((prev) => ({ ...prev, [key]: value }))
           }
         />
+        {isGroup2(state) ? (
+          <>
+            <hr className="my-8 border-border" />
+            <SectionHeading icon={Compass}>
+              {SECTION_B.manipulationCheck.title}
+            </SectionHeading>
+            <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+              {SECTION_B.manipulationCheck.instruction}
+            </p>
+            <SectionHeading icon={Compass}>
+              {SECTION_B.manipulationCheck.attitude.title}
+            </SectionHeading>
+            <LikertBlock
+              items={SECTION_B.manipulationCheck.attitude.items.map((i) => i.text)}
+              keys={SECTION_B.manipulationCheck.attitude.items.map((i) => i.key)}
+              values={sectionBLikert}
+              namePrefix="b"
+              scale={SECTION_B.manipulationCheck.scale}
+              onChange={(key, value) =>
+                setSectionBLikert((prev) => ({ ...prev, [key]: value }))
+              }
+            />
+            <hr className="my-8 border-border" />
+            <SectionHeading icon={Users}>
+              {SECTION_B.manipulationCheck.norms.title}
+            </SectionHeading>
+            <LikertBlock
+              items={SECTION_B.manipulationCheck.norms.items.map((i) => i.text)}
+              keys={SECTION_B.manipulationCheck.norms.items.map((i) => i.key)}
+              values={sectionBLikert}
+              namePrefix="b"
+              scale={SECTION_B.manipulationCheck.scale}
+              onChange={(key, value) =>
+                setSectionBLikert((prev) => ({ ...prev, [key]: value }))
+              }
+            />
+            <hr className="my-8 border-border" />
+            <SectionHeading icon={Scale}>
+              {SECTION_B.manipulationCheck.pbc.title}
+            </SectionHeading>
+            <LikertBlock
+              items={SECTION_B.manipulationCheck.pbc.items.map((i) => i.text)}
+              keys={SECTION_B.manipulationCheck.pbc.items.map((i) => i.key)}
+              values={sectionBLikert}
+              namePrefix="b"
+              scale={SECTION_B.manipulationCheck.scale}
+              onChange={(key, value) =>
+                setSectionBLikert((prev) => ({ ...prev, [key]: value }))
+              }
+            />
+          </>
+        ) : null}
         <hr className="my-8 border-border" />
         <SectionHeading icon={MessageSquare}>
           {SECTION_B.perception.title}
@@ -613,6 +654,21 @@ export function ExperimentApp() {
           namePrefix="b"
           onChange={(key, value) =>
             setSectionBText((prev) => ({ ...prev, [key]: value }))
+          }
+        />
+        <hr className="my-8 border-border" />
+        <SectionHeading icon={Scale}>{SECTION_B.timing.title}</SectionHeading>
+        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
+          {SECTION_B.timing.instruction}
+        </p>
+        <LikertBlock
+          items={SECTION_B.timing.items.map((i) => i.text)}
+          keys={SECTION_B.timing.items.map((i) => i.key)}
+          values={sectionBLikert}
+          namePrefix="b"
+          scale={SECTION_B.timing.scale}
+          onChange={(key, value) =>
+            setSectionBLikert((prev) => ({ ...prev, [key]: value }))
           }
         />
         <button
@@ -780,11 +836,9 @@ export function ExperimentApp() {
           <PageHeader title={scenario.title} />
           <div className="card scenario-intro">
             <div className="scenario-box scenario-box-intro">{scenario.text}</div>
-            <p className="scenario-intro-lead">
-              On the next screen you will chat with an Assistant about this
-              situation. Take a moment to read the scenario, then start when
-              you feel ready.
-            </p>
+            <div className="scenario-intro-lead whitespace-pre-line">
+              {USER_TASK_INSTRUCTIONS}
+            </div>
             <button
               type="button"
               className="btn-primary inline-flex items-center gap-2"
@@ -811,7 +865,7 @@ export function ExperimentApp() {
             onSend={() => void handleSendMessage()}
             isLoading={loading}
             refusalDelivered={state.refusalDelivered}
-            onContinue={() => void handleContinueToSectionA()}
+            onContinue={() => void handleContinueToSectionB()}
             continueLabel="Continue to questions"
           />
         </div>

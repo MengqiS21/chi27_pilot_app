@@ -1,4 +1,4 @@
-import type { Condition, ExperimentState, ScenarioType } from "./types";
+import type { Condition, ExperimentState, PilotGroup, ScenarioType } from "./types";
 
 export function currentScenarioType(
   state: Pick<ExperimentState, "scenarioOrder" | "scenarioIndex">
@@ -14,8 +14,14 @@ export function isExperiencedScenario(
 
 export function currentCondition(
   state: Pick<ExperimentState, "assignedCondition">
-): Condition {
+): Condition | null {
   return state.assignedCondition;
+}
+
+export function isGroup2(
+  state: Pick<ExperimentState, "pilotGroup">
+): boolean {
+  return state.pilotGroup === "group_2";
 }
 
 export function resetScenarioChat(): Pick<
