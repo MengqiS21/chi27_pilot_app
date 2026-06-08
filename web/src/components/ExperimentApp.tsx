@@ -29,8 +29,15 @@ import { OpenTextBlock } from "@/components/OpenTextBlock";
 import { PageHeader } from "@/components/PageHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { SectionHeading } from "@/components/SectionHeading";
-import { CONSENT_TEXT } from "@/content/consent";
-import { SCENARIOS, USER_TASK_INSTRUCTIONS } from "@/content/scenarios";
+import { ConsentFormContent } from "@/components/ConsentFormContent";
+import { ScenarioReadPage } from "@/components/ScenarioReadPage";
+import {
+  CONSENT_FORM,
+  EMPTY_PUBLICATION_CONSENT,
+  hasPublicationChoice,
+  type PublicationConsentValues,
+} from "@/content/consent";
+import { SCENARIOS, USER_TASK_CHAT_INSTRUCTIONS, scenarioDisplayTitle } from "@/content/scenarios";
 import {
   DEMOGRAPHICS,
   SECTION_A,
@@ -76,6 +83,8 @@ export function ExperimentApp() {
 
   const [accessCode, setAccessCode] = useState("");
   const [consentAgreed, setConsentAgreed] = useState(false);
+  const [publicationConsent, setPublicationConsent] =
+    useState<PublicationConsentValues>(EMPTY_PUBLICATION_CONSENT);
 
   const [screening, setScreening] = useState<Record<string, string>>({});
   const [sectionA, setSectionA] = useState(() => emptyLikert(SECTION_A_KEYS));
@@ -234,8 +243,23 @@ export function ExperimentApp() {
 
   const handleConsentContinue = async () => {
     setError(null);
+    if (!hasPublicationChoice(publicationConsent)) {
+      setError(
+        "Please select at least one publication option, or choose Disagree and enter a pseudonym."
+      );
+      return;
+    }
+
     setLoading(true);
     try {
+      await saveSurvey({
+        section: "consent",
+        responses: {
+          agreed: true,
+          publication: publicationConsent,
+        },
+      });
+
       const res = await fetch("/api/assign", {
         method: "POST",
         headers: { "Content-Type": "application/json" },
@@ -689,7 +713,13 @@ export function ExperimentApp() {
 
   return (
     <main
-      className={`page-shell ${state.stage === "scenario_chat" ? "page-shell-chat" : ""}`}
+      className={`page-shell ${
+        state.stage === "scenario_chat"
+          ? "page-shell-chat"
+          : state.stage === "scenario_view"
+            ? "page-shell-scenario-read"
+            : ""
+      }`}
     >
       {showProgress ? <ProgressBar current={progressStep} total={3} /> : null}
 
@@ -796,9 +826,12 @@ export function ExperimentApp() {
 
       {state.stage === "consent" && (
         <>
-          <PageHeader title="Before We Begin" icon={ClipboardList} />
+          <PageHeader title={CONSENT_FORM.pageTitle} icon={ClipboardList} />
           <div className="card">
-            <div className="consent-box">{CONSENT_TEXT}</div>
+            <ConsentFormContent
+              publication={publicationConsent}
+              onPublicationChange={setPublicationConsent}
+            />
             <hr className="my-8 border-border" />
             <label className="checkbox-row mb-6">
               <input
@@ -813,13 +846,17 @@ export function ExperimentApp() {
                   className="shrink-0 text-accent"
                   aria-hidden
                 />
-                I agree and wish to continue
+                {CONSENT_FORM.agreementLabel}
               </span>
             </label>
             <button
               type="button"
               className="btn-primary inline-flex items-center gap-2"
-              disabled={!consentAgreed || loading}
+              disabled={
+                !consentAgreed ||
+                !hasPublicationChoice(publicationConsent) ||
+                loading
+              }
               onClick={() => void handleConsentContinue()}
             >
               Continue
@@ -833,22 +870,12 @@ export function ExperimentApp() {
         <div
           className={`stage-transition ${stageVisible ? "stage-transition-visible" : ""}`}
         >
-          <PageHeader title={scenario.title} />
-          <div className="card scenario-intro">
-            <div className="scenario-box scenario-box-intro">{scenario.text}</div>
-            <div className="scenario-intro-lead whitespace-pre-line">
-              {USER_TASK_INSTRUCTIONS}
-            </div>
-            <button
-              type="button"
-              className="btn-primary inline-flex items-center gap-2"
-              disabled={loading}
-              onClick={() => void handleScenarioViewContinue()}
-            >
-              Start conversation
-              <ArrowRight size={18} strokeWidth={2} aria-hidden />
-            </button>
-          </div>
+          <ScenarioReadPage
+            title={scenarioDisplayTitle(scenarioType)}
+            text={scenario.text}
+            loading={loading}
+            onContinue={() => void handleScenarioViewContinue()}
+          />
         </div>
       )}
 
@@ -857,8 +884,9 @@ export function ExperimentApp() {
           className={`stage-transition ${stageVisible ? "stage-transition-visible" : ""}`}
         >
           <ChatShell
-            scenarioTitle={scenario.title}
+            scenarioTitle={scenarioDisplayTitle(scenarioType)}
             scenarioText={scenario.text}
+            taskInstructions={USER_TASK_CHAT_INSTRUCTIONS}
             messages={state.messages}
             input={chatInput}
             onInputChange={setChatInput}
