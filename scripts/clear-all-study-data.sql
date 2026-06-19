@@ -1,11 +1,17 @@
--- Clear all study data (keeps table structure, RLS, and policies).
+-- Clear ALL study data for pilot + phase1 (keeps table structure, RLS, and policies).
 -- Run in Supabase SQL Editor. This cannot be undone.
 --
--- Active tables used by pilot + phase1 web apps:
---   participants, survey_responses, conversations
+-- Both apps share one database; participants are distinguished by study:
+--   'pilot'   — chi27_pilot_app
+--   'phase1'  — chi27_phase1_app
 --
--- scenario_responses is legacy and not written by current apps; include only
--- if you also want to wipe old test rows there.
+-- This script wipes EVERY row in the active tables (both studies).
+-- To clear only one study, use:
+--   clear-phase1-study-data.sql
+--   clear-pilot-study-data.sql
+--
+-- Active tables: participants, survey_responses, conversations
+-- scenario_responses is legacy; uncomment below if you want that wiped too.
 
 TRUNCATE TABLE
   conversations,
