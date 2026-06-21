@@ -14,15 +14,6 @@ export const SCALE_INSTRUCTIONS = {
 export const SCREENING = {
   items: [
     {
-      key: "scr1",
-      text: "Are you 21 years of age or older?",
-      options: [
-        { value: "yes", label: "Yes" },
-        { value: "no", label: "No" },
-      ],
-      screenOut: "no",
-    },
-    {
       key: "scr2",
       text: "Have you ever used an AI tool, such as a chatbot or AI assistant, to seek emotional support or to talk through something personal or emotional?",
       options: [
@@ -288,16 +279,18 @@ export const DEMOGRAPHICS = {
     label: "Country or region you currently live in",
     type: "text" as const,
   },
-  englishFirst: {
+  aiEmotionalUseFrequency: {
     key: "dem7",
-    label: "Is English your first language?",
-    options: ["Yes", "No", "Prefer not to say"],
-  },
-  englishComfort: {
-    key: "dem8",
     label:
-      "Are you able to read and complete surveys and interviews comfortably in English?",
-    options: ["Yes", "No"],
+      "How often do you currently use AI tools to discuss personal, emotional, or stressful experiences?",
+    options: [
+      "Never",
+      "Less than monthly",
+      "Monthly",
+      "Weekly",
+      "Several times per week",
+      "Daily",
+    ],
   },
 } as const;
 

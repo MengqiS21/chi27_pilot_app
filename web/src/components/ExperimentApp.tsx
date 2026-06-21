@@ -30,6 +30,8 @@ import { PageHeader } from "@/components/PageHeader";
 import { ProgressBar } from "@/components/ProgressBar";
 import { SectionHeading } from "@/components/SectionHeading";
 import { ConsentFormContent } from "@/components/ConsentFormContent";
+import { DebriefFinish } from "@/components/DebriefFinish";
+import { ScreenedOutFinish } from "@/components/ScreenedOutFinish";
 import { ScenarioReadPage } from "@/components/ScenarioReadPage";
 import {
   CONSENT_FORM,
@@ -203,7 +205,7 @@ export function ExperimentApp() {
     setError(null);
     for (const item of SCREENING.items) {
       if (!screening[item.key]) {
-        setError("Please answer all screening questions.");
+        setError("Please answer the screening question.");
         return;
       }
     }
@@ -788,8 +790,8 @@ export function ExperimentApp() {
       {state.stage === "screening" && (
         <>
           <PageHeader
-            title="Screening Questions"
-            lead="Please answer the following questions to confirm your eligibility."
+            title="Screening Question"
+            lead="Please answer the following question to confirm your eligibility."
             icon={ClipboardList}
           />
           <div className="card space-y-8">
@@ -830,15 +832,7 @@ export function ExperimentApp() {
         </>
       )}
 
-      {state.stage === "screened_out" && (
-        <>
-          <PageHeader
-            title="Thank You"
-            lead="Based on your responses, you are not eligible for this study. You may close this window."
-            icon={CheckCircle2}
-          />
-        </>
-      )}
+      {state.stage === "screened_out" && <ScreenedOutFinish />}
 
       {state.stage === "consent" && (
         <>
@@ -967,21 +961,7 @@ export function ExperimentApp() {
         </>
       )}
 
-      {state.stage === "debrief" && (
-        <>
-          <PageHeader
-            title="You're All Done"
-            lead="Thank you for your time. You may close this browser window when you're ready."
-            icon={CheckCircle2}
-          />
-          <div className="card">
-            <p className="text-base leading-relaxed text-ink">
-              If you have questions about this research, please contact the study
-              team at <strong>[researcher email]</strong>.
-            </p>
-          </div>
-        </>
-      )}
+      {state.stage === "debrief" && <DebriefFinish />}
     </main>
   );
 }
