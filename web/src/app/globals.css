@@ -175,7 +175,7 @@
   }
 
   .scenario-box {
-    @apply mb-7 rounded-btn border-l-[3px] bg-scenario px-6 py-5 text-base italic leading-[1.75] text-ink sm:text-lg;
+    @apply mb-7 rounded-btn border-l-[3px] bg-scenario px-6 py-5 text-[0.875rem] italic leading-relaxed text-ink sm:text-[0.9375rem];
     border-left-color: var(--accent);
   }
 
@@ -224,19 +224,20 @@
   }
 
   .likert-scale-wrap {
-    @apply overflow-x-auto;
+    @apply w-full;
   }
 
   .likert-scale {
-    @apply inline-flex w-auto items-end gap-2 overflow-visible sm:gap-3;
+    @apply grid w-full items-end overflow-visible;
+    column-gap: clamp(0.5rem, 2.5vw, 1.25rem);
   }
 
   .likert-scale-cell {
-    @apply relative flex shrink-0 flex-col items-center overflow-visible;
+    @apply relative flex min-w-0 flex-col items-center overflow-visible;
   }
 
   .likert-hint {
-    @apply relative mb-2 flex min-h-[2.25rem] w-auto items-end justify-center overflow-visible sm:min-h-[2.5rem];
+    @apply relative mb-2 flex w-full min-h-[2.25rem] items-end justify-center overflow-visible sm:min-h-[2.5rem];
   }
 
   .likert-hint-end,
