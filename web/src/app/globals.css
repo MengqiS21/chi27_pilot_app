@@ -224,11 +224,15 @@
   }
 
   .likert-item {
-    @apply border-b border-border py-5 last:border-b-0;
+    @apply border-b border-dashed border-border/50 py-5 last:border-b-0;
   }
 
   .likert-statement {
     @apply mb-2.5 text-[1.0625rem] font-medium leading-snug text-ink sm:text-[1.1875rem] sm:leading-snug;
+  }
+
+  .survey-group-divider {
+    @apply my-8 border-0 border-t border-solid border-border;
   }
 
   .likert-scale-wrap {

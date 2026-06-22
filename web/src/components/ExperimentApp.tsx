@@ -537,7 +537,7 @@ export function ExperimentApp() {
             setSectionA((prev) => ({ ...prev, [key]: value }))
           }
         />
-        <hr className="my-8 border-border" />
+        <hr className="survey-group-divider" />
         <SurveyGroupHeading icon={SECTION_A.engagement.participantIcon}>
           {SECTION_A.engagement.participantHeading}
         </SurveyGroupHeading>
@@ -551,7 +551,7 @@ export function ExperimentApp() {
             setSectionA((prev) => ({ ...prev, [key]: value }))
           }
         />
-        <hr className="my-8 border-border" />
+        <hr className="survey-group-divider" />
         <LikertBlock
           items={SECTION_A.severity.items.map((i) => i.text)}
           keys={SECTION_A.severity.items.map((i) => i.key)}
@@ -600,7 +600,7 @@ export function ExperimentApp() {
             setSectionBLikert((prev) => ({ ...prev, [key]: value }))
           }
         />
-        <hr className="my-8 border-border" />
+        <hr className="survey-group-divider" />
         <SurveyGroupHeading icon={SECTION_B.agency.participantIcon}>
           {SECTION_B.agency.participantHeading}
         </SurveyGroupHeading>
@@ -614,7 +614,7 @@ export function ExperimentApp() {
             setSectionBLikert((prev) => ({ ...prev, [key]: value }))
           }
         />
-        <hr className="my-8 border-border" />
+        <hr className="survey-group-divider" />
         <SurveyGroupHeading icon={SECTION_B.continuity.participantIcon}>
           {SECTION_B.continuity.participantHeading}
         </SurveyGroupHeading>
@@ -630,7 +630,7 @@ export function ExperimentApp() {
         />
         {isGroup2(state) ? (
           <>
-            <hr className="my-8 border-border" />
+            <hr className="survey-group-divider" />
             <SurveyGroupHeading icon={SECTION_B.manipulationCheck.participantIcon}>
               {SECTION_B.manipulationCheck.participantHeading}
             </SurveyGroupHeading>
@@ -644,7 +644,7 @@ export function ExperimentApp() {
                 setSectionBLikert((prev) => ({ ...prev, [key]: value }))
               }
             />
-            <hr className="my-8 border-border" />
+            <hr className="survey-group-divider" />
             <LikertBlock
               items={SECTION_B.manipulationCheck.norms.items.map((i) => i.text)}
               keys={SECTION_B.manipulationCheck.norms.items.map((i) => i.key)}
@@ -655,7 +655,7 @@ export function ExperimentApp() {
                 setSectionBLikert((prev) => ({ ...prev, [key]: value }))
               }
             />
-            <hr className="my-8 border-border" />
+            <hr className="survey-group-divider" />
             <LikertBlock
               items={SECTION_B.manipulationCheck.pbc.items.map((i) => i.text)}
               keys={SECTION_B.manipulationCheck.pbc.items.map((i) => i.key)}
@@ -668,7 +668,7 @@ export function ExperimentApp() {
             />
           </>
         ) : null}
-        <hr className="my-8 border-border" />
+        <hr className="survey-group-divider" />
         <OpenTextBlock
           items={SECTION_B.perception.items}
           values={sectionBText}
@@ -677,7 +677,7 @@ export function ExperimentApp() {
             setSectionBText((prev) => ({ ...prev, [key]: value }))
           }
         />
-        <hr className="my-8 border-border" />
+        <hr className="survey-group-divider" />
         <LikertBlock
           items={SECTION_B.timing.items.map((i) => i.text)}
           keys={SECTION_B.timing.items.map((i) => i.key)}
@@ -817,7 +817,7 @@ export function ExperimentApp() {
           <PageHeader title={CONSENT_FORM.pageTitle} icon={ClipboardList} />
           <div className="card">
             <ConsentFormContent />
-            <hr className="my-8 border-border" />
+            <hr className="survey-group-divider" />
             <label className="checkbox-row mb-6">
               <input
                 type="checkbox"
