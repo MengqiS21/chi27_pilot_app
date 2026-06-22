@@ -24,7 +24,7 @@
 
 @layer components {
   .page-shell {
-    @apply mx-auto w-full max-w-content px-6 pb-16 pt-12;
+    @apply mx-auto w-full max-w-content px-4 pb-16 pt-12 sm:px-6;
   }
 
   .page-shell-chat {
@@ -109,15 +109,15 @@
   }
 
   .page-title {
-    @apply text-[1.75rem] font-bold leading-tight text-ink;
+    @apply text-[1.375rem] font-bold leading-tight text-ink sm:text-[1.75rem];
   }
 
   .page-lead {
-    @apply mt-2 text-base leading-relaxed text-muted;
+    @apply mt-2 text-[0.9375rem] leading-relaxed text-muted sm:text-base;
   }
 
   .section-title {
-    @apply text-2xl font-bold text-ink;
+    @apply text-xl font-bold text-ink sm:text-2xl;
   }
 
   .icon-badge {
@@ -228,7 +228,7 @@
   }
 
   .likert-statement {
-    @apply mb-2.5 text-xl font-medium leading-snug text-ink sm:text-[1.1875rem] sm:leading-snug;
+    @apply mb-2.5 text-[1.0625rem] font-medium leading-snug text-ink sm:text-[1.1875rem] sm:leading-snug;
   }
 
   .likert-scale-wrap {
@@ -362,6 +362,74 @@
 
   .likert-option-hit input {
     @apply sr-only;
+  }
+
+  /* Mobile: keep V-shape + endpoint hints above; fix horizontal overlap */
+  @media (max-width: 639px) {
+    .likert-scale-wrap {
+      @apply pr-0;
+    }
+
+    .likert-scale {
+      width: 100%;
+      column-gap: clamp(0.125rem, 0.6vw, 0.375rem);
+    }
+
+    .likert-size-sm {
+      width: 1.5rem;
+      height: 1.5rem;
+    }
+
+    .likert-size-md {
+      width: 1.875rem;
+      height: 1.875rem;
+    }
+
+    .likert-size-lg {
+      width: 2.125rem;
+      height: 2.125rem;
+    }
+
+    .likert-size-xl {
+      width: 2.625rem;
+      height: 2.625rem;
+    }
+
+    .likert-option-hit {
+      min-width: 0;
+      min-height: 2.5rem;
+      padding: 0.125rem;
+    }
+
+    .likert-edge-anchor-start .likert-option-hit.likert-size-xl {
+      margin-left: calc((100% - 2.625rem) / 2);
+    }
+
+    .likert-edge-anchor-start .likert-option-hit.likert-size-lg {
+      margin-left: calc((100% - 2.125rem) / 2);
+    }
+
+    .likert-edge-anchor-end .likert-option-hit.likert-size-xl {
+      margin-right: calc((100% - 2.625rem) / 2);
+    }
+
+    .likert-edge-anchor-end .likert-option-hit.likert-size-lg {
+      margin-right: calc((100% - 2.125rem) / 2);
+    }
+
+    .likert-hint-end {
+      max-width: 3rem;
+      white-space: normal;
+      line-height: 1.1;
+      font-size: 0.5rem;
+    }
+
+    .likert-hint-selected {
+      max-width: 3.25rem;
+      white-space: normal;
+      line-height: 1.1;
+      font-size: 0.5625rem;
+    }
   }
 
   .chat-shell {
