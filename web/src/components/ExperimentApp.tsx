@@ -6,15 +6,11 @@ import {
   CheckCircle2,
   ClipboardList,
   ClipboardPen,
-  Compass,
   Eye,
-  HeartHandshake,
   KeyRound,
   MessageSquare,
-  Scale,
   ShieldCheck,
   Sparkles,
-  Users,
   UserCircle,
 } from "lucide-react";
 import { ChatShell } from "@/components/ChatShell";
@@ -27,19 +23,22 @@ import {
 import { LikertBlock } from "@/components/LikertBlock";
 import { OpenTextBlock } from "@/components/OpenTextBlock";
 import { PageHeader } from "@/components/PageHeader";
+import { SurveyGroupHeading } from "@/components/SurveyGroupHeading";
 import { ProgressBar } from "@/components/ProgressBar";
-import { SectionHeading } from "@/components/SectionHeading";
 import { ConsentFormContent } from "@/components/ConsentFormContent";
 import { DebriefFinish } from "@/components/DebriefFinish";
 import { ScreenedOutFinish } from "@/components/ScreenedOutFinish";
+import { ScenarioMaterialPanel } from "@/components/ScenarioMaterialPanel";
 import { ScenarioReadPage } from "@/components/ScenarioReadPage";
 import {
   CONSENT_FORM,
-  EMPTY_PUBLICATION_CONSENT,
-  hasPublicationChoice,
-  type PublicationConsentValues,
 } from "@/content/consent";
-import { SCENARIOS, USER_TASK_CHAT_INSTRUCTIONS, scenarioDisplayTitle } from "@/content/scenarios";
+import {
+  SCENARIO_MATERIAL_EYEBROW,
+  SCENARIOS,
+  USER_TASK_CHAT_INSTRUCTIONS,
+  scenarioDisplayTitle,
+} from "@/content/scenarios";
 import {
   DEMOGRAPHICS,
   SECTION_A,
@@ -88,8 +87,6 @@ export function ExperimentApp() {
 
   const [accessCode, setAccessCode] = useState("");
   const [consentAgreed, setConsentAgreed] = useState(false);
-  const [publicationConsent, setPublicationConsent] =
-    useState<PublicationConsentValues>(EMPTY_PUBLICATION_CONSENT);
 
   const [screening, setScreening] = useState<Record<string, string>>({});
   const [sectionA, setSectionA] = useState(() => emptyLikert(SECTION_A_KEYS));
@@ -261,12 +258,6 @@ export function ExperimentApp() {
 
   const handleConsentContinue = async () => {
     setError(null);
-    if (!hasPublicationChoice(publicationConsent)) {
-      setError(
-        "Please select at least one publication option, or choose Disagree and enter a pseudonym."
-      );
-      return;
-    }
 
     setLoading(true);
     try {
@@ -274,7 +265,6 @@ export function ExperimentApp() {
         section: "consent",
         responses: {
           agreed: true,
-          publication: publicationConsent,
         },
       });
 
@@ -516,17 +506,26 @@ export function ExperimentApp() {
       ? state.scenarioIndex + 1
       : state.scenarioIndex + 1;
 
-  const renderSectionA = () => (
+  const renderSectionA = () => {
+    const scenarioKey = currentScenarioType(state);
+    return (
     <>
-      <PageHeader title={SECTION_A.title} icon={Eye} />
-      <div className="scenario-box">
-        {SCENARIOS[currentScenarioType(state)].text}
-      </div>
+      <PageHeader
+        title={SECTION_A.title}
+        lead={SECTION_A.lead}
+        icon={Eye}
+      />
+      <ScenarioMaterialPanel
+        variant="embedded"
+        eyebrow={SCENARIO_MATERIAL_EYEBROW}
+        title={scenarioDisplayTitle(scenarioKey)}
+        text={SCENARIOS[scenarioKey].text}
+        titleId={`section-a-scenario-${state.scenarioIndex}`}
+      />
       <div className="card">
-        <SectionHeading icon={Eye}>{SECTION_A.realism.title}</SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_A.realism.instruction}
-        </p>
+        <SurveyGroupHeading icon={SECTION_A.realism.participantIcon}>
+          {SECTION_A.realism.participantHeading}
+        </SurveyGroupHeading>
         <LikertBlock
           items={SECTION_A.realism.items.map((i) => i.text)}
           keys={SECTION_A.realism.items.map((i) => i.key)}
@@ -538,12 +537,9 @@ export function ExperimentApp() {
           }
         />
         <hr className="my-8 border-border" />
-        <SectionHeading icon={HeartHandshake}>
-          {SECTION_A.engagement.title}
-        </SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_A.engagement.instruction}
-        </p>
+        <SurveyGroupHeading icon={SECTION_A.engagement.participantIcon}>
+          {SECTION_A.engagement.participantHeading}
+        </SurveyGroupHeading>
         <LikertBlock
           items={SECTION_A.engagement.items.map((i) => i.text)}
           keys={SECTION_A.engagement.items.map((i) => i.key)}
@@ -555,10 +551,6 @@ export function ExperimentApp() {
           }
         />
         <hr className="my-8 border-border" />
-        <SectionHeading icon={Scale}>{SECTION_A.severity.title}</SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_A.severity.instruction}
-        </p>
         <LikertBlock
           items={SECTION_A.severity.items.map((i) => i.text)}
           keys={SECTION_A.severity.items.map((i) => i.key)}
@@ -580,18 +572,20 @@ export function ExperimentApp() {
         </button>
       </div>
     </>
-  );
+    );
+  };
 
   const renderSectionB = () => (
     <>
-      <PageHeader title={SECTION_B.title} icon={MessageSquare} />
+      <PageHeader
+        title={SECTION_B.title}
+        lead={SECTION_B.lead}
+        icon={MessageSquare}
+      />
       <div className="card">
-        <SectionHeading icon={Compass}>
-          {SECTION_B.understanding.title}
-        </SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_B.understanding.instruction}
-        </p>
+        <SurveyGroupHeading icon={SECTION_B.understanding.participantIcon}>
+          {SECTION_B.understanding.participantHeading}
+        </SurveyGroupHeading>
         <LikertBlock
           items={SECTION_B.understanding.items.map((i) => i.text)}
           keys={SECTION_B.understanding.items.map((i) => i.key)}
@@ -603,10 +597,9 @@ export function ExperimentApp() {
           }
         />
         <hr className="my-8 border-border" />
-        <SectionHeading icon={Users}>{SECTION_B.agency.title}</SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_B.agency.instruction}
-        </p>
+        <SurveyGroupHeading icon={SECTION_B.agency.participantIcon}>
+          {SECTION_B.agency.participantHeading}
+        </SurveyGroupHeading>
         <LikertBlock
           items={SECTION_B.agency.items.map((i) => i.text)}
           keys={SECTION_B.agency.items.map((i) => i.key)}
@@ -618,12 +611,9 @@ export function ExperimentApp() {
           }
         />
         <hr className="my-8 border-border" />
-        <SectionHeading icon={HeartHandshake}>
-          {SECTION_B.continuity.title}
-        </SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_B.continuity.instruction}
-        </p>
+        <SurveyGroupHeading icon={SECTION_B.continuity.participantIcon}>
+          {SECTION_B.continuity.participantHeading}
+        </SurveyGroupHeading>
         <LikertBlock
           items={SECTION_B.continuity.items.map((i) => i.text)}
           keys={SECTION_B.continuity.items.map((i) => i.key)}
@@ -637,15 +627,9 @@ export function ExperimentApp() {
         {isGroup2(state) ? (
           <>
             <hr className="my-8 border-border" />
-            <SectionHeading icon={Compass}>
-              {SECTION_B.manipulationCheck.title}
-            </SectionHeading>
-            <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-              {SECTION_B.manipulationCheck.instruction}
-            </p>
-            <SectionHeading icon={Compass}>
-              {SECTION_B.manipulationCheck.attitude.title}
-            </SectionHeading>
+            <SurveyGroupHeading icon={SECTION_B.manipulationCheck.participantIcon}>
+              {SECTION_B.manipulationCheck.participantHeading}
+            </SurveyGroupHeading>
             <LikertBlock
               items={SECTION_B.manipulationCheck.attitude.items.map((i) => i.text)}
               keys={SECTION_B.manipulationCheck.attitude.items.map((i) => i.key)}
@@ -657,9 +641,6 @@ export function ExperimentApp() {
               }
             />
             <hr className="my-8 border-border" />
-            <SectionHeading icon={Users}>
-              {SECTION_B.manipulationCheck.norms.title}
-            </SectionHeading>
             <LikertBlock
               items={SECTION_B.manipulationCheck.norms.items.map((i) => i.text)}
               keys={SECTION_B.manipulationCheck.norms.items.map((i) => i.key)}
@@ -671,9 +652,6 @@ export function ExperimentApp() {
               }
             />
             <hr className="my-8 border-border" />
-            <SectionHeading icon={Scale}>
-              {SECTION_B.manipulationCheck.pbc.title}
-            </SectionHeading>
             <LikertBlock
               items={SECTION_B.manipulationCheck.pbc.items.map((i) => i.text)}
               keys={SECTION_B.manipulationCheck.pbc.items.map((i) => i.key)}
@@ -687,9 +665,6 @@ export function ExperimentApp() {
           </>
         ) : null}
         <hr className="my-8 border-border" />
-        <SectionHeading icon={MessageSquare}>
-          {SECTION_B.perception.title}
-        </SectionHeading>
         <OpenTextBlock
           items={SECTION_B.perception.items}
           values={sectionBText}
@@ -699,10 +674,6 @@ export function ExperimentApp() {
           }
         />
         <hr className="my-8 border-border" />
-        <SectionHeading icon={Scale}>{SECTION_B.timing.title}</SectionHeading>
-        <p className="mb-4 text-[0.9375rem] leading-relaxed text-muted">
-          {SECTION_B.timing.instruction}
-        </p>
         <LikertBlock
           items={SECTION_B.timing.items.map((i) => i.text)}
           keys={SECTION_B.timing.items.map((i) => i.key)}
@@ -838,10 +809,7 @@ export function ExperimentApp() {
         <>
           <PageHeader title={CONSENT_FORM.pageTitle} icon={ClipboardList} />
           <div className="card">
-            <ConsentFormContent
-              publication={publicationConsent}
-              onPublicationChange={setPublicationConsent}
-            />
+            <ConsentFormContent />
             <hr className="my-8 border-border" />
             <label className="checkbox-row mb-6">
               <input
@@ -862,11 +830,7 @@ export function ExperimentApp() {
             <button
               type="button"
               className="btn-primary inline-flex items-center gap-2"
-              disabled={
-                !consentAgreed ||
-                !hasPublicationChoice(publicationConsent) ||
-                loading
-              }
+              disabled={!consentAgreed || loading}
               onClick={() => void handleConsentContinue()}
             >
               Continue
@@ -920,7 +884,11 @@ export function ExperimentApp() {
 
       {state.stage === "section_c" && (
         <>
-          <PageHeader title={SECTION_C.title} icon={ClipboardPen} />
+          <PageHeader
+            title={SECTION_C.title}
+            lead={SECTION_C.lead}
+            icon={ClipboardPen}
+          />
           <div className="card">
             <OpenTextBlock
               items={SECTION_C.items}
@@ -945,7 +913,11 @@ export function ExperimentApp() {
 
       {state.stage === "demographics" && (
         <>
-          <PageHeader title={DEMOGRAPHICS.title} icon={UserCircle} />
+          <PageHeader
+            title={DEMOGRAPHICS.title}
+            lead={DEMOGRAPHICS.lead}
+            icon={UserCircle}
+          />
           <div className="card">
             <DemographicsForm values={demographics} onChange={setDemographics} />
             <button

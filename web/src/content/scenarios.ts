@@ -1,4 +1,4 @@
-export const SCENARIOS = {
+ export const SCENARIOS = {
   scenario_1: {
     /** Internal label — not shown to participants. */
     title: "Persistent Low Mood",
@@ -27,6 +27,12 @@ export type ScenarioKey = keyof typeof SCENARIOS;
 export function scenarioDisplayTitle(key: ScenarioKey): string {
   return SCENARIOS[key].displayTitle;
 }
+
+/** Section A — material participants read before rating the scenario. */
+export const SCENARIO_MATERIAL_EYEBROW = "Scenario material";
+
+/** Pre-conversation read page — signals read-then-experience, not survey material. */
+export const SCENARIO_EXPERIENCE_EYEBROW = "Your scenario for experience";
 
 export const SCENARIO_READ_CONTINUE_LABEL = "Start conversation";
 

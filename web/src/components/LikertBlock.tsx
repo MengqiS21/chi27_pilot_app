@@ -74,7 +74,7 @@ export function LikertBlock({
         return (
           <div key={fieldKey} className="likert-item">
             <p className="likert-statement">{statement}</p>
-            <div className="likert-scale-wrap">
+            <div className="likert-scale-wrap" data-scale={scale}>
               <div
                 className="likert-scale"
                 style={{
@@ -86,11 +86,14 @@ export function LikertBlock({
                 {scaleValues.map((n, index) => {
                   const isSelected = selected === n;
                   const hint = hintAboveCircle(n, isSelected, config, min, max);
-                  const isEndHint = n === min || n === max;
+                  const isScaleStart = n === min;
+                  const isScaleEnd = n === max;
+                  const isEndHint = isScaleStart || isScaleEnd;
                   const sizeClass = sizeClassForIndex(index, scaleValues.length);
+                  const useEdgeAnchor = isScaleStart || isScaleEnd;
 
-                  return (
-                    <div key={n} className="likert-scale-cell">
+                  const scaleCellContent = (
+                    <>
                       <div
                         className="likert-hint"
                         aria-hidden={hint ? undefined : true}
@@ -132,6 +135,29 @@ export function LikertBlock({
                           <span className="likert-option-num">{n}</span>
                         </span>
                       </label>
+                    </>
+                  );
+
+                  return (
+                    <div
+                      key={n}
+                      className={`likert-scale-cell${
+                        isScaleStart ? " likert-scale-cell-start" : ""
+                      }${isScaleEnd ? " likert-scale-cell-end" : ""}`}
+                    >
+                      {useEdgeAnchor ? (
+                        <div
+                          className={`likert-edge-anchor${
+                            isScaleStart
+                              ? " likert-edge-anchor-start"
+                              : " likert-edge-anchor-end"
+                          }`}
+                        >
+                          {scaleCellContent}
+                        </div>
+                      ) : (
+                        scaleCellContent
+                      )}
                     </div>
                   );
                 })}

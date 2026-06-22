@@ -1,5 +1,7 @@
 import { ArrowRight } from "lucide-react";
+import { ScenarioMaterialPanel } from "@/components/ScenarioMaterialPanel";
 import {
+  SCENARIO_EXPERIENCE_EYEBROW,
   SCENARIO_READ_CONTINUE_LABEL,
   USER_TASK_READ_INSTRUCTIONS,
 } from "@/content/scenarios";
@@ -20,13 +22,13 @@ export function ScenarioReadPage({
   return (
     <section className="scenario-read" aria-labelledby="scenario-read-title">
       <div className="scenario-read-inner">
-        <p className="scenario-read-eyebrow">Your situation</p>
-        <h1 id="scenario-read-title" className="scenario-read-title">
-          {title}
-        </h1>
-        <div className="scenario-read-body">
-          <p>{text}</p>
-        </div>
+        <ScenarioMaterialPanel
+          variant="inline"
+          eyebrow={SCENARIO_EXPERIENCE_EYEBROW}
+          title={title}
+          text={text}
+          titleId="scenario-read-title"
+        />
         <p className="scenario-read-hint whitespace-pre-line">
           {USER_TASK_READ_INSTRUCTIONS}
         </p>

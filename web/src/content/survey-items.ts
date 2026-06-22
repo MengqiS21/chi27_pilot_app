@@ -1,12 +1,10 @@
-/** Pilot Study questionnaire — verbatim from implementation spec. */
+import type { SurveyGroupIconKey } from "@/content/survey-group-icons";
 
 export const SCALE_INSTRUCTIONS = {
   agree7:
     "Response options (1–7): 1 = Strongly disagree · 2 = Disagree · 3 = Somewhat disagree · 4 = Neither agree nor disagree · 5 = Somewhat agree · 6 = Agree · 7 = Strongly agree.",
   agree5:
     "Response options (1–5): 1 = Strongly disagree · 2 = Disagree · 3 = Neither agree nor disagree · 4 = Agree · 5 = Strongly agree.",
-  severity7:
-    "Response options (1–7): 1 = Not at all serious · 2 = Slightly serious · 3 = Somewhat serious · 4 = Moderately serious · 5 = Quite serious · 6 = Very serious · 7 = Extremely serious.",
   timing5:
     "Response options (1–5): 1 = Much too early · 2 = A little too early · 3 = About right · 4 = A little too late · 5 = Much too late.",
 } as const;
@@ -26,9 +24,13 @@ export const SCREENING = {
 } as const;
 
 export const SECTION_A = {
-  title: "Scenario material validation",
+  title: "Reading the scenario",
+  lead: "Read the scenario below, then answer the next few groups of statements.",
   realism: {
+    /** Internal construct label — not shown to participants. */
     title: "Scenario realism",
+    participantHeading: "Your first pass through the scenario",
+    participantIcon: "book-open" as SurveyGroupIconKey,
     scale: "agree7" as const,
     instruction: SCALE_INSTRUCTIONS.agree7,
     items: [
@@ -42,20 +44,28 @@ export const SECTION_A = {
   },
   engagement: {
     title: "Emotional engagement",
+    participantHeading: "While the scenario was still in front of you",
+    participantIcon: "heart" as SurveyGroupIconKey,
     scale: "agree7" as const,
     instruction: SCALE_INSTRUCTIONS.agree7,
     items: [
-      { key: "eng1", text: "I could easily imagine myself in this situation." },
+      {
+        key: "eng1",
+        text: "I could picture myself in the scene of the events described in this situation.",
+      },
       {
         key: "eng2",
-        text: "While reading, I felt emotionally involved in what the person was going through.",
+        text: "I was mentally involved in this situation while reading it.",
+      },
+      {
+        key: "eng3",
+        text: "This situation affected me emotionally.",
       },
     ],
   },
   severity: {
     title: "Perceived severity",
     scale: "severity7" as const,
-    instruction: SCALE_INSTRUCTIONS.severity7,
     items: [
       {
         key: "sev1",
@@ -66,9 +76,13 @@ export const SECTION_A = {
 } as const;
 
 export const SECTION_B = {
-  title: "Post-conversation appraisal",
+  title: "After the conversation",
+  lead: "The following statements refer to the conversation you just had.",
   understanding: {
+    /** Internal construct label — not shown to participants. */
     title: "Perceived understanding",
+    participantHeading: "The AI's response, in hindsight",
+    participantIcon: "lightbulb" as SurveyGroupIconKey,
     scale: "agree5" as const,
     instruction: SCALE_INSTRUCTIONS.agree5,
     items: [
@@ -82,6 +96,8 @@ export const SECTION_B = {
   },
   agency: {
     title: "Perceived agency",
+    participantHeading: "Where you stood when the chat ended",
+    participantIcon: "compass" as SurveyGroupIconKey,
     scale: "agree5" as const,
     instruction: SCALE_INSTRUCTIONS.agree5,
     items: [
@@ -101,6 +117,8 @@ export const SECTION_B = {
   },
   continuity: {
     title: "Perceived relational continuity",
+    participantHeading: "The way the exchange unfolded",
+    participantIcon: "messages-square" as SurveyGroupIconKey,
     scale: "agree5" as const,
     instruction: SCALE_INSTRUCTIONS.agree5,
     items: [
@@ -121,6 +139,9 @@ export const SECTION_B = {
   },
   manipulationCheck: {
     title: "Manipulation check",
+    /** One heading for attitude + norms + pbc blocks (Group 2 only). */
+    participantHeading: "What the AI suggested about going further",
+    participantIcon: "forward" as SurveyGroupIconKey,
     scale: "agree5" as const,
     instruction: SCALE_INSTRUCTIONS.agree5,
     attitude: {
@@ -198,7 +219,8 @@ export const SECTION_B = {
 } as const;
 
 export const SECTION_C = {
-  title: "Item feedback",
+  title: "A few follow-up questions",
+  lead: "These are about the survey itself, not the scenario.",
   items: [
     {
       key: "fb1",
@@ -216,7 +238,8 @@ export const SECTION_C = {
 } as const;
 
 export const DEMOGRAPHICS = {
-  title: "Demographic information",
+  title: "About you",
+  lead: "Almost done.",
   age: {
     key: "dem1",
     label: "What is your age?",
