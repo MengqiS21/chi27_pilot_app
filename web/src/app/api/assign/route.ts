@@ -4,7 +4,7 @@ import {
   PILOT_ALLOCATION_SIZE,
   getPilotAllocationSlot,
 } from "@/lib/pilot-allocation";
-import { PILOT_ALLOCATION_SEED } from "@/lib/study-config";
+import { PILOT_ALLOCATION_SEED, TRANSITION_TRIGGER_T } from "@/lib/study-config";
 import { getSupabase } from "@/lib/supabase";
 import type { Condition, PilotGroup, ScenarioType } from "@/lib/types";
 
@@ -140,7 +140,6 @@ export async function POST(request: Request) {
           interaction_scenario: assignment.interactionScenario,
           assigned_condition: assignment.assignedCondition,
           condition_label: assignment.conditionLabel,
-          condition_order: assignment.conditionOrder,
           latin_square_row: slotIndex,
         })
         .eq("id", participantId)
@@ -155,6 +154,18 @@ export async function POST(request: Request) {
       }
 
       if (updated) {
+        await supabase.from("survey_responses").insert({
+          participant_id: participantId,
+          section: "assignment_meta",
+          responses: {
+            transition_trigger_t: TRANSITION_TRIGGER_T,
+            scenario: assignment.interactionScenario,
+            condition_label: assignment.conditionLabel,
+            allocation_slot_index: slotIndex,
+            pilot_group: assignment.pilotGroup,
+          },
+        });
+
         return NextResponse.json(assignmentResponse(updated as ParticipantRow));
       }
 

@@ -11,13 +11,9 @@
 --   clear-pilot-study-data.sql
 --
 -- Active tables: participants, survey_responses, conversations
--- scenario_responses is legacy; uncomment below if you want that wiped too.
 
 TRUNCATE TABLE
   conversations,
   survey_responses,
   participants
 CASCADE;
-
--- Optional: legacy table (uncomment if needed)
--- TRUNCATE TABLE scenario_responses;

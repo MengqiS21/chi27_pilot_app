@@ -47,7 +47,6 @@ export function assignPilot(
     interactionScenario,
     assignedCondition,
     conditionLabel: allocationSlot.conditionLabel,
-    conditionOrder: assignedCondition ? [assignedCondition] : [],
   };
 }
 
@@ -62,6 +61,5 @@ export function assignPhase1(count: number) {
     scenarioOrder: [scenarioType],
     experiencedScenarioIndex: 0,
     assignedCondition,
-    conditionOrder: [assignedCondition],
   };
 }
