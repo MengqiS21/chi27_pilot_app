@@ -224,7 +224,12 @@
   }
 
   .likert-item {
-    @apply border-b border-dashed border-border/50 py-5 last:border-b-0;
+    @apply py-5;
+    border-bottom: 1px dashed rgba(228, 223, 239, 0.65);
+  }
+
+  .likert-item:last-child {
+    border-bottom: none;
   }
 
   .likert-statement {
