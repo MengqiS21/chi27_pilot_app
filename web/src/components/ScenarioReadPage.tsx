@@ -1,4 +1,5 @@
 import { ArrowRight } from "lucide-react";
+import { FormErrorAlert } from "@/components/FormErrorAlert";
 import { ScenarioMaterialPanel } from "@/components/ScenarioMaterialPanel";
 import {
   SCENARIO_EXPERIENCE_EYEBROW,
@@ -10,6 +11,7 @@ type ScenarioReadPageProps = {
   title: string;
   text: string;
   loading?: boolean;
+  error?: string | null;
   onContinue: () => void;
 };
 
@@ -17,6 +19,7 @@ export function ScenarioReadPage({
   title,
   text,
   loading,
+  error = null,
   onContinue,
 }: ScenarioReadPageProps) {
   return (
@@ -35,15 +38,18 @@ export function ScenarioReadPage({
       </div>
 
       <div className="scenario-read-actions">
-        <button
-          type="button"
-          className="btn-primary inline-flex items-center gap-2"
-          disabled={loading}
-          onClick={onContinue}
-        >
-          {SCENARIO_READ_CONTINUE_LABEL}
-          <ArrowRight size={18} strokeWidth={2} aria-hidden />
-        </button>
+        <div className="flex w-full flex-col gap-4 sm:w-auto">
+          <FormErrorAlert message={error} />
+          <button
+            type="button"
+            className="btn-primary inline-flex items-center gap-2"
+            disabled={loading}
+            onClick={onContinue}
+          >
+            {SCENARIO_READ_CONTINUE_LABEL}
+            <ArrowRight size={18} strokeWidth={2} aria-hidden />
+          </button>
+        </div>
       </div>
     </section>
   );

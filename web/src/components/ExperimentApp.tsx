@@ -26,6 +26,7 @@ import { PageHeader } from "@/components/PageHeader";
 import { SurveyGroupHeading } from "@/components/SurveyGroupHeading";
 import { ProgressBar } from "@/components/ProgressBar";
 import { ConsentFormContent } from "@/components/ConsentFormContent";
+import { FormErrorAlert } from "@/components/FormErrorAlert";
 import { DebriefFinish } from "@/components/DebriefFinish";
 import { ScreenedOutFinish } from "@/components/ScreenedOutFinish";
 import { ScenarioMaterialPanel } from "@/components/ScenarioMaterialPanel";
@@ -561,15 +562,18 @@ export function ExperimentApp() {
             setSectionA((prev) => ({ ...prev, [key]: value }))
           }
         />
-        <button
-          type="button"
-          className="btn-primary mt-8 inline-flex items-center gap-2"
-          disabled={loading}
-          onClick={() => void handleSectionASubmit()}
-        >
-          Continue
-          <ArrowRight size={18} strokeWidth={2} aria-hidden />
-        </button>
+        <div className="mt-8 space-y-4">
+          <FormErrorAlert message={error} />
+          <button
+            type="button"
+            className="btn-primary inline-flex items-center gap-2"
+            disabled={loading}
+            onClick={() => void handleSectionASubmit()}
+          >
+            Continue
+            <ArrowRight size={18} strokeWidth={2} aria-hidden />
+          </button>
+        </div>
       </div>
     </>
     );
@@ -684,15 +688,18 @@ export function ExperimentApp() {
             setSectionBLikert((prev) => ({ ...prev, [key]: value }))
           }
         />
-        <button
-          type="button"
-          className="btn-primary mt-8 inline-flex items-center gap-2"
-          disabled={loading}
-          onClick={() => void handleSectionBSubmit()}
-        >
-          Continue
-          <ArrowRight size={18} strokeWidth={2} aria-hidden />
-        </button>
+        <div className="mt-8 space-y-4">
+          <FormErrorAlert message={error} />
+          <button
+            type="button"
+            className="btn-primary inline-flex items-center gap-2"
+            disabled={loading}
+            onClick={() => void handleSectionBSubmit()}
+          >
+            Continue
+            <ArrowRight size={18} strokeWidth={2} aria-hidden />
+          </button>
+        </div>
       </div>
     </>
   );
@@ -711,12 +718,6 @@ export function ExperimentApp() {
       }`}
     >
       {showProgress ? <ProgressBar current={progressStep} total={3} /> : null}
-
-      {error ? (
-        <p className="alert-error mb-6" role="alert">
-          {error}
-        </p>
-      ) : null}
 
       {state.stage === "landing" && (
         <>
@@ -746,14 +747,17 @@ export function ExperimentApp() {
                 autoComplete="off"
               />
             </div>
-            <button
-              type="button"
-              className="btn-primary shrink-0 sm:mb-0.5"
-              disabled={loading}
-              onClick={() => void handleBegin()}
-            >
-              {loading ? "Starting…" : "Begin"}
-            </button>
+            <div className="flex flex-col gap-3 sm:shrink-0">
+              <FormErrorAlert message={error} />
+              <button
+                type="button"
+                className="btn-primary sm:mb-0.5"
+                disabled={loading}
+                onClick={() => void handleBegin()}
+              >
+                {loading ? "Starting…" : "Begin"}
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -790,15 +794,18 @@ export function ExperimentApp() {
                 </div>
               </fieldset>
             ))}
-            <button
-              type="button"
-              className="btn-primary inline-flex items-center gap-2"
-              disabled={loading}
-              onClick={() => void handleScreeningContinue()}
-            >
-              Continue
-              <ArrowRight size={18} strokeWidth={2} aria-hidden />
-            </button>
+            <div className="space-y-4">
+              <FormErrorAlert message={error} />
+              <button
+                type="button"
+                className="btn-primary inline-flex items-center gap-2"
+                disabled={loading}
+                onClick={() => void handleScreeningContinue()}
+              >
+                Continue
+                <ArrowRight size={18} strokeWidth={2} aria-hidden />
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -827,15 +834,18 @@ export function ExperimentApp() {
                 {CONSENT_FORM.agreementLabel}
               </span>
             </label>
-            <button
-              type="button"
-              className="btn-primary inline-flex items-center gap-2"
-              disabled={!consentAgreed || loading}
-              onClick={() => void handleConsentContinue()}
-            >
-              Continue
-              <ArrowRight size={18} strokeWidth={2} aria-hidden />
-            </button>
+            <div className="space-y-4">
+              <FormErrorAlert message={error} />
+              <button
+                type="button"
+                className="btn-primary inline-flex items-center gap-2"
+                disabled={!consentAgreed || loading}
+                onClick={() => void handleConsentContinue()}
+              >
+                Continue
+                <ArrowRight size={18} strokeWidth={2} aria-hidden />
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -848,6 +858,7 @@ export function ExperimentApp() {
             title={scenarioDisplayTitle(scenarioType)}
             text={scenario.text}
             loading={loading}
+            error={error}
             onContinue={() => void handleScenarioViewContinue()}
           />
         </div>
@@ -867,6 +878,7 @@ export function ExperimentApp() {
             onSend={() => void handleSendMessage()}
             isLoading={loading}
             refusalDelivered={state.refusalDelivered}
+            error={error}
             onContinue={() => void handleContinueToSectionB()}
             continueLabel="Continue to questions"
           />
@@ -898,15 +910,18 @@ export function ExperimentApp() {
                 setSectionC((prev) => ({ ...prev, [key]: value }))
               }
             />
-            <button
-              type="button"
-              className="btn-primary mt-8 inline-flex items-center gap-2"
-              disabled={loading}
-              onClick={() => void handleSectionCSubmit()}
-            >
-              Continue
-              <ArrowRight size={18} strokeWidth={2} aria-hidden />
-            </button>
+            <div className="mt-8 space-y-4">
+              <FormErrorAlert message={error} />
+              <button
+                type="button"
+                className="btn-primary inline-flex items-center gap-2"
+                disabled={loading}
+                onClick={() => void handleSectionCSubmit()}
+              >
+                Continue
+                <ArrowRight size={18} strokeWidth={2} aria-hidden />
+              </button>
+            </div>
           </div>
         </>
       )}
@@ -920,15 +935,18 @@ export function ExperimentApp() {
           />
           <div className="card">
             <DemographicsForm values={demographics} onChange={setDemographics} />
-            <button
-              type="button"
-              className="btn-primary mt-8 inline-flex items-center gap-2"
-              disabled={loading}
-              onClick={() => void handleDemographicsSubmit()}
-            >
-              Submit
-              <ArrowRight size={18} strokeWidth={2} aria-hidden />
-            </button>
+            <div className="mt-8 space-y-4">
+              <FormErrorAlert message={error} />
+              <button
+                type="button"
+                className="btn-primary inline-flex items-center gap-2"
+                disabled={loading}
+                onClick={() => void handleDemographicsSubmit()}
+              >
+                Submit
+                <ArrowRight size={18} strokeWidth={2} aria-hidden />
+              </button>
+            </div>
           </div>
         </>
       )}
