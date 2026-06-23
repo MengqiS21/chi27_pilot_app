@@ -128,11 +128,11 @@ export const SECTION_B = {
       },
       {
         key: "con2",
-        text: "As the AI moved toward suggesting other support, the conversation still felt personal and continuous.",
+        text: "Throughout the conversation, I felt the AI stayed connected to what I was sharing.",
       },
       {
         key: "con3",
-        text: "The way the conversation shifted felt abrupt and disconnected. (R)",
+        text: "At times, the AI's responses felt abrupt or disconnected from what I had shared.",
         reverseScored: true,
       },
     ],
