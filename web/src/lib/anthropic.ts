@@ -1,10 +1,16 @@
 import Anthropic from "@anthropic-ai/sdk";
 import {
+  CONDITION_INSTRUCTION_OVERRIDE,
   CONDITION_PROMPTS,
   GENERAL_PROMPT,
+  GENERAL_PROMPT_GROUP_2,
+  getTransitionPhasePrompt,
 } from "@/content/system-prompts";
 import { toPlainText } from "@/lib/plain-text";
-import { TRANSITION_TRIGGER_T } from "@/lib/study-config";
+import {
+  TRANSITION_TRIGGER_T,
+  maxUserTurnsForGroup,
+} from "@/lib/study-config";
 import type { ChatMessage, Condition, PilotGroup } from "./types";
 
 const DEFAULT_MODEL = "claude-sonnet-4-20250514";
@@ -24,14 +30,30 @@ export function buildSystemPrompt({
   condition,
   turnCount,
 }: ChatOptions): string {
-  let system = GENERAL_PROMPT;
+  const system =
+    pilotGroup === "group_2" ? GENERAL_PROMPT_GROUP_2 : GENERAL_PROMPT;
 
   if (
     pilotGroup === "group_2" &&
     condition &&
     turnCount >= TRANSITION_TRIGGER_T
   ) {
-    system += `\n\n${CONDITION_PROMPTS[condition] ?? CONDITION_PROMPTS.A}`;
+    const totalTransitionTurns =
+      maxUserTurnsForGroup("group_2") - TRANSITION_TRIGGER_T + 1;
+    const transitionTurn = turnCount - TRANSITION_TRIGGER_T + 1;
+    const phasePrompt = getTransitionPhasePrompt(
+      condition,
+      transitionTurn,
+      totalTransitionTurns
+    );
+
+    let conditionBlock = CONDITION_INSTRUCTION_OVERRIDE;
+    conditionBlock += `\n\n${CONDITION_PROMPTS[condition] ?? CONDITION_PROMPTS.A}`;
+    if (phasePrompt) {
+      conditionBlock += `\n\n${phasePrompt}`;
+    }
+
+    return system + `\n\n${conditionBlock}`;
   }
 
   return system;
