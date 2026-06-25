@@ -14,29 +14,8 @@ type Props = {
   scale?: ScalePreset;
 };
 
-/** Symmetric V-shape: ends largest, center smallest. Index-based, not value-based. */
-const SYMMETRIC_SIZE_CLASSES: Record<number, string[]> = {
-  5: [
-    "likert-size-xl",
-    "likert-size-lg",
-    "likert-size-sm",
-    "likert-size-lg",
-    "likert-size-xl",
-  ],
-  7: [
-    "likert-size-xl",
-    "likert-size-lg",
-    "likert-size-md",
-    "likert-size-sm",
-    "likert-size-md",
-    "likert-size-lg",
-    "likert-size-xl",
-  ],
-};
-
-function sizeClassForIndex(index: number, total: number): string {
-  return SYMMETRIC_SIZE_CLASSES[total]?.[index] ?? "likert-size-md";
-}
+/** All scale points use the same circle size as the endpoint (Strongly disagree / Strongly agree). */
+const UNIFORM_SIZE_CLASS = "likert-size-xl";
 
 function hintAboveCircle(
   n: number,
@@ -83,13 +62,13 @@ export function LikertBlock({
                 role="radiogroup"
                 aria-label={statement}
               >
-                {scaleValues.map((n, index) => {
+                {scaleValues.map((n) => {
                   const isSelected = selected === n;
                   const hint = hintAboveCircle(n, isSelected, config, min, max);
                   const isScaleStart = n === min;
                   const isScaleEnd = n === max;
                   const isEndHint = isScaleStart || isScaleEnd;
-                  const sizeClass = sizeClassForIndex(index, scaleValues.length);
+                  const sizeClass = UNIFORM_SIZE_CLASS;
                   const useEdgeAnchor = isScaleStart || isScaleEnd;
 
                   const scaleCellContent = (

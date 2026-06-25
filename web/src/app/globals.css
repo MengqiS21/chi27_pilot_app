@@ -373,7 +373,7 @@
     @apply sr-only;
   }
 
-  /* Mobile: keep V-shape + endpoint hints above; fix horizontal overlap */
+  /* Mobile: endpoint hints above circles; uniform circle size */
   @media (max-width: 639px) {
     .likert-scale-wrap {
       @apply pr-0;
