@@ -31,7 +31,7 @@ export const LABEL_TO_CONDITION = {
   pbc: "D",
 } as const satisfies Record<ConditionLabel, keyof typeof CONDITION_LABELS>;
 
-/** Seeded shuffle seed for the 20-slot pilot allocation table. */
+/** Seeded shuffle seed for the 30-slot pilot allocation table. */
 export const PILOT_ALLOCATION_SEED = Number(
   process.env.PILOT_ALLOCATION_SEED ??
     process.env.NEXT_PUBLIC_PILOT_ALLOCATION_SEED ??

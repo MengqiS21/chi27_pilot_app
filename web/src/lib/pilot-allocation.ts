@@ -11,7 +11,7 @@ export type PilotAllocationSlot = {
   conditionLabel: ConditionLabel | null;
 };
 
-export const PILOT_ALLOCATION_SIZE = 20;
+export const PILOT_ALLOCATION_SIZE = 30;
 
 /** Mulberry32 — deterministic PRNG for seeded Fisher–Yates shuffle. */
 function mulberry32(seed: number): () => number {
@@ -41,16 +41,16 @@ function buildUnshuffledSlots(): PilotAllocationSlot[] {
   for (let i = 0; i < 10; i++) {
     slots.push({ pilotGroup: "group_1", conditionLabel: null });
   }
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 5; i++) {
     slots.push({ pilotGroup: "group_2", conditionLabel: "baseline" });
   }
-  for (let i = 0; i < 3; i++) {
+  for (let i = 0; i < 5; i++) {
     slots.push({ pilotGroup: "group_2", conditionLabel: "attitude" });
   }
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 5; i++) {
     slots.push({ pilotGroup: "group_2", conditionLabel: "subjective_norms" });
   }
-  for (let i = 0; i < 2; i++) {
+  for (let i = 0; i < 5; i++) {
     slots.push({ pilotGroup: "group_2", conditionLabel: "pbc" });
   }
 
