@@ -9,5 +9,5 @@ export const DEBRIEF = {
   researcherEmail: "shi21@uw.edu",
   completionInstruction:
     "To receive credit for your participation, please return to CloudResearch and enter the completion code below:",
-  completionCode: "CHI27-PILOT-EXIT",
+  completionCode: "PILOT-FINISH",
 } as const;
