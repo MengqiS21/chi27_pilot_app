@@ -60,6 +60,12 @@ import { STUDY, maxUserTurnsForGroup } from "@/lib/study-config";
 import {
   captureCloudResearchParams,
 } from "@/lib/cloudresearch-params";
+import {
+  clearPilotSessionParticipantId,
+  persistPilotSessionParticipantId,
+  readPilotSessionParticipantId,
+} from "@/lib/pilot-session-storage";
+import type { SessionRestorePayload } from "@/lib/session-restore-types";
 import { INITIAL_STATE, type ExperimentState } from "@/lib/types";
 import { scrollPageToTop, useFadeTransition } from "@/lib/use-fade-transition";
 
@@ -78,6 +84,25 @@ function allLikertAnswered(
   return keys.every((k) => values[k] !== null);
 }
 
+async function fetchSessionRestore(
+  query: { participantId?: string; assignmentId?: string }
+): Promise<SessionRestorePayload | null> {
+  const params = new URLSearchParams();
+  if (query.participantId) {
+    params.set("participantId", query.participantId);
+  }
+  if (query.assignmentId) {
+    params.set("assignmentId", query.assignmentId);
+  }
+
+  const res = await fetch(`/api/session?${params.toString()}`);
+  if (!res.ok) {
+    return null;
+  }
+
+  return (await res.json()) as SessionRestorePayload;
+}
+
 export function ExperimentApp() {
   const [state, setState] = useState<ExperimentState>({
     ...INITIAL_STATE,
@@ -85,6 +110,7 @@ export function ExperimentApp() {
   });
   const [error, setError] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [sessionBootstrapping, setSessionBootstrapping] = useState(true);
 
   const [accessCode, setAccessCode] = useState("");
   const [consentAgreed, setConsentAgreed] = useState(false);
@@ -106,6 +132,71 @@ export function ExperimentApp() {
 
   const [chatInput, setChatInput] = useState("");
   const { visible: stageVisible, run: withStageFade } = useFadeTransition();
+
+  const applySessionRestore = useCallback((session: SessionRestorePayload) => {
+    persistPilotSessionParticipantId(session.participantId);
+
+    if (session.screening) {
+      setScreening(session.screening);
+    }
+    setConsentAgreed(session.consentAgreed);
+
+    if (session.pilotGroup) {
+      const bKeys = sectionBLikertKeysForGroup(session.pilotGroup);
+      setSectionBLikert(emptyLikert(bKeys));
+    }
+
+    setState((s) => ({
+      ...s,
+      participantId: session.participantId,
+      stage: session.stage,
+      scenarioIndex: session.scenarioIndex,
+      scenarioOrder: session.scenarioOrder,
+      experiencedScenarioIndex: session.experiencedScenarioIndex,
+      interactionScenario: session.interactionScenario,
+      pilotGroup: session.pilotGroup,
+      assignedCondition: session.assignedCondition,
+      messages: session.messages,
+      turnCount: session.turnCount,
+      refusalDelivered: session.refusalDelivered,
+    }));
+  }, []);
+
+  useEffect(() => {
+    let cancelled = false;
+
+    async function bootstrapSession() {
+      const storedParticipantId = readPilotSessionParticipantId();
+      const captured = captureCloudResearchParams(window.location.search);
+      const assignmentId = captured.cloudresearch_assignment_id;
+
+      let session: SessionRestorePayload | null = null;
+
+      if (storedParticipantId) {
+        session = await fetchSessionRestore({ participantId: storedParticipantId });
+      }
+
+      if (!session && assignmentId) {
+        session = await fetchSessionRestore({ assignmentId });
+      }
+
+      if (cancelled) return;
+
+      if (session) {
+        applySessionRestore(session);
+      } else if (storedParticipantId) {
+        clearPilotSessionParticipantId();
+      }
+
+      setSessionBootstrapping(false);
+    }
+
+    void bootstrapSession();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [applySessionRestore]);
 
   useEffect(() => {
     scrollPageToTop();
@@ -186,6 +277,19 @@ export function ExperimentApp() {
         }
         throw new Error(msg);
       }
+
+      persistPilotSessionParticipantId(data.participantId);
+
+      if (data.resumed) {
+        const session = await fetchSessionRestore({
+          participantId: data.participantId,
+        });
+        if (session) {
+          applySessionRestore(session);
+          return;
+        }
+      }
+
       setState((s) => ({
         ...s,
         participantId: data.participantId,
@@ -703,6 +807,18 @@ export function ExperimentApp() {
       </div>
     </>
   );
+
+  if (sessionBootstrapping) {
+    return (
+      <main className="page-shell">
+        <PageHeader
+          title="Welcome"
+          lead="Restoring your session…"
+          icon={Sparkles}
+        />
+      </main>
+    );
+  }
 
   const scenarioType = currentScenarioType(state);
   const scenario = SCENARIOS[scenarioType];
