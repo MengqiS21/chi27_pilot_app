@@ -34,14 +34,7 @@ export function DebriefFinish({ participantId }: Props) {
           </p>
         ))}
         <p className="text-base leading-relaxed text-ink">
-          If you have any questions about this study, please contact us at{" "}
-          <a
-            href={`mailto:${DEBRIEF.researcherEmail}`}
-            className="font-semibold text-accent underline-offset-2 hover:underline"
-          >
-            {DEBRIEF.researcherEmail}
-          </a>
-          .
+          {DEBRIEF.contactInstruction}
         </p>
         <div className="rounded-card border border-border bg-page px-5 py-4">
           <p className="mb-3 text-base leading-relaxed text-ink">

@@ -16,6 +16,9 @@ export function ScreenedOutFinish() {
             {paragraph}
           </p>
         ))}
+        <p className="text-base leading-relaxed text-ink">
+          {SCREENED_OUT.contactInstruction}
+        </p>
         <div className="rounded-card border border-border bg-page px-5 py-4">
           <p className="mb-3 text-base leading-relaxed text-ink">
             {SCREENED_OUT.completionInstruction}

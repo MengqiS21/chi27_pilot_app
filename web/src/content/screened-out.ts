@@ -8,7 +8,9 @@ export const SCREENED_OUT = {
     "Based on your response, you are not eligible to continue at this time.",
     "Thank you again for your interest.",
   ],
+  contactInstruction:
+    "If you have any questions about this study, please contact the study publisher through CloudResearch at any time.",
   completionInstruction:
-    "To confirm your participation on CloudResearch, please return there and enter the completion code below:",
+    "To confirm your participation on CloudResearch, please return there and enter the completion code below manually. Do not rely on your browser's back button or an automatic redirect link—type the code on CloudResearch's completion page:",
   completionCode: "PILOT-PARTIAL",
 } as const;

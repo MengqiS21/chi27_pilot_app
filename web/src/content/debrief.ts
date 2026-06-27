@@ -6,8 +6,9 @@ export const DEBRIEF = {
     "Your responses help us understand how people interact with AI in emotionally meaningful conversations.",
     "This work informs more thoughtful design of AI systems that can better support people's wellbeing and communication needs.",
   ],
-  researcherEmail: "shi21@uw.edu",
+  contactInstruction:
+    "If you have any questions about this study, please contact the study publisher through CloudResearch at any time.",
   completionInstruction:
-    "To receive credit for your participation, please return to CloudResearch and enter the completion code below:",
+    "To receive credit for your participation, please return to CloudResearch and enter the completion code below manually. Do not rely on your browser's back button or an automatic redirect link—type the code on CloudResearch's completion page:",
   completionCode: "PILOT-FINISH",
 } as const;
