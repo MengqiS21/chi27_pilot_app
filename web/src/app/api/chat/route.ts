@@ -60,6 +60,10 @@ export async function POST(request: Request) {
     });
     if (dbError) {
       console.error("Failed to save conversation:", dbError);
+      return NextResponse.json(
+        { error: `Could not save conversation. ${dbError}` },
+        { status: 500 }
+      );
     }
 
     return NextResponse.json({

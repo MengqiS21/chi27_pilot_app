@@ -483,6 +483,23 @@ export function ExperimentApp() {
     setError(null);
     setLoading(true);
     try {
+      const snapshotRes = await fetch("/api/conversations", {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({
+          participantId: state.participantId,
+          scenarioIndex: state.scenarioIndex,
+          scenarioType: currentScenarioType(state),
+          condition: currentCondition(state),
+          messages: state.messages,
+          turnCount: state.turnCount,
+        }),
+      });
+      const snapshotData = await snapshotRes.json();
+      if (!snapshotRes.ok) {
+        throw new Error(snapshotData.error ?? "Could not save conversation");
+      }
+
       await withStageFade(async () => {
         await patchStage("section_b", state.scenarioIndex);
         setState((s) => ({ ...s, stage: "section_b" }));
@@ -1067,7 +1084,9 @@ export function ExperimentApp() {
         </>
       )}
 
-      {state.stage === "debrief" && <DebriefFinish />}
+      {state.stage === "debrief" && (
+        <DebriefFinish participantId={state.participantId} />
+      )}
     </main>
   );
 }

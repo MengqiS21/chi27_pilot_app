@@ -1,8 +1,25 @@
+"use client";
+
+import { useEffect } from "react";
 import { CheckCircle2 } from "lucide-react";
 import { DEBRIEF } from "@/content/debrief";
 import { PageHeader } from "@/components/PageHeader";
 
-export function DebriefFinish() {
+type Props = {
+  participantId: string | null;
+};
+
+export function DebriefFinish({ participantId }: Props) {
+  useEffect(() => {
+    if (!participantId) return;
+
+    void fetch("/api/complete", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({ participantId }),
+    });
+  }, [participantId]);
+
   return (
     <>
       <PageHeader
